@@ -22,7 +22,7 @@ class InputWidget extends StatelessWidget {
       ),
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextField(
+      child: TextFormField(
         obscureText: obscureText,
         controller: controller,
         decoration: InputDecoration(

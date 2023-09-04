@@ -42,7 +42,7 @@ class _InputConfirmPassWidgetState extends State<InputConfirmPassWidget> {
           ),
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: TextField(
+          child: TextFormField(
             obscureText: widget.obscureText,
             controller: widget.controller,
             onChanged: (_) =>
@@ -63,7 +63,7 @@ class _InputConfirmPassWidgetState extends State<InputConfirmPassWidget> {
           ),
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: TextField(
+          child: TextFormField(
             obscureText: widget.obscureText,
             controller: widget.confirmController,
             onChanged: (_) =>

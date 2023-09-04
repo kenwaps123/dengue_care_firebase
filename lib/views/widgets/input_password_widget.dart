@@ -22,7 +22,16 @@ class InputPasswordWidget extends StatelessWidget {
       ),
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter some text';
+          }
+          if (value.length < 6) {
+            return 'Password must be at least 6 characters';
+          }
+          return null;
+        },
         obscureText: obscureText,
         controller: controller,
         decoration: InputDecoration(

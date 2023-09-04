@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
-class InputAgeWidget extends StatelessWidget {
-  const InputAgeWidget(
+class InputEmailWidget extends StatelessWidget {
+  const InputEmailWidget(
       {super.key,
       required this.hintText,
       required this.controller,
@@ -23,11 +23,22 @@ class InputAgeWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
+        validator: (value) {
+          // add email validation
+          if (value == null || value.isEmpty) {
+            return 'Please enter some text';
+          }
+
+          bool emailValid = RegExp(
+                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+              .hasMatch(value);
+          if (!emailValid) {
+            return 'Please enter a valid email';
+          }
+
+          return null;
+        },
         obscureText: obscureText,
-        inputFormatters: <TextInputFormatter>[
-          FilteringTextInputFormatter.allow(
-              RegExp(r'[0-9]')), // Only allow digits and decimal point
-        ],
         controller: controller,
         decoration: InputDecoration(
           border: InputBorder.none,
