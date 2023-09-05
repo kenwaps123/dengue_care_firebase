@@ -25,7 +25,7 @@ class InputPasswordWidget extends StatelessWidget {
       child: TextFormField(
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please enter some text';
+            return 'This field is required';
           }
           if (value.length < 6) {
             return 'Password must be at least 6 characters';

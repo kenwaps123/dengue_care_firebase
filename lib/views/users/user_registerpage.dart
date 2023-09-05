@@ -1,11 +1,16 @@
+import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../utility/utils.dart';
 import '../login_page.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_confirmpass_widget.dart';
+import '../widgets/input_email_widget.dart';
 import '../widgets/input_widget.dart';
 
 class UserRegisterPage extends StatefulWidget {
@@ -16,6 +21,7 @@ class UserRegisterPage extends StatefulWidget {
 }
 
 class _UserRegisterPageState extends State<UserRegisterPage> {
+  final _auth = FirebaseAuth.instance;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _sexController = TextEditingController();
@@ -28,6 +34,19 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       TextEditingController();
   bool _isPasswordNotVisible = true;
   final _formKey = GlobalKey<FormState>();
+  final String userType = 'User';
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _nameController.dispose();
+    _ageController.dispose();
+    _sexController.dispose();
+    _contactNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,28 +89,12 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                           obscureText: false,
                         ),
                         const SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: IntlPhoneField(
-                            initialCountryCode: 'PH',
-                            showCountryFlag: false,
-                            disableLengthCheck: true,
+                        InputContactNumber(
+                            hintText: "Contact Number (11-digit)",
                             controller: _contactNumberController,
-                            decoration: InputDecoration(
-                              hintText: "Contact number",
-                              border: InputBorder.none,
-                              hintStyle: GoogleFonts.poppins(),
-                              // border: UnderlineInputBorder(),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        InputWidget(
+                            obscureText: false),
+                        const SizedBox(height: 20),
+                        InputEmailWidget(
                           hintText: "Email",
                           controller: _emailController,
                           obscureText: false,
@@ -125,7 +128,16 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               ),
                             ),
                             onPressed: () {
-                              if (_formKey.currentState!.validate()) {}
+                              if (_formKey.currentState!.validate()) {
+                                signUp(
+                                    _emailController.text,
+                                    _confirmPasswordController.text,
+                                    _nameController.text,
+                                    _ageController.text,
+                                    _sexController.text,
+                                    _sexController.text,
+                                    userType);
+                              }
                             },
                             child: Text("Register",
                                 style: GoogleFonts.poppins(fontSize: 20)),
@@ -152,5 +164,45 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
         ),
       ),
     );
+  }
+
+  void signUp(String email, String password, String name, String age,
+      String sex, String contactnumber, String userType) async {
+    try {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ));
+      await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) => {
+                postDetailsToFirestore(
+                    email, name, age, sex, contactnumber, userType)
+              })
+          .catchError((e) {
+        Utils.showSnackBar(e.message);
+      });
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      Utils.showSnackBar(e.message);
+    }
+  }
+
+  postDetailsToFirestore(String email, String name, String age, String sex,
+      String contactnumber, String userType) async {
+    var user = _auth.currentUser;
+    CollectionReference ref = FirebaseFirestore.instance.collection('users');
+    ref.doc(user!.uid).set({
+      'email': _emailController.text,
+      'name': _nameController.text,
+      'age': _ageController.text,
+      'sex': _sexController.text,
+      'contact_number': _contactNumberController.text,
+      'role': userType
+    });
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }

@@ -23,6 +23,12 @@ class InputAgeWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'This field is required';
+          }
+          return null;
+        },
         obscureText: obscureText,
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(

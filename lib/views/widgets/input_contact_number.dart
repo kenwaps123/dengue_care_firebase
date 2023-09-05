@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class InputEmailWidget extends StatelessWidget {
-  const InputEmailWidget(
+class InputContactNumber extends StatelessWidget {
+  const InputContactNumber(
       {super.key,
       required this.hintText,
       required this.controller,
@@ -23,19 +23,14 @@ class InputEmailWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(11),
+          FilteringTextInputFormatter.digitsOnly,
+        ],
         validator: (value) {
-          // add email validation
           if (value == null || value.isEmpty) {
             return 'This field is required';
           }
-
-          bool emailValid = RegExp(
-                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-              .hasMatch(value);
-          if (!emailValid) {
-            return 'Please enter a valid email';
-          }
-
           return null;
         },
         obscureText: obscureText,
