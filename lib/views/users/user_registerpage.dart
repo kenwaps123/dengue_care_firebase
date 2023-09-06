@@ -1,3 +1,4 @@
+import 'package:denguecare_firebase/views/home_page.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -128,16 +129,17 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               ),
                             ),
                             onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                signUp(
-                                    _emailController.text,
-                                    _confirmPasswordController.text,
-                                    _nameController.text,
-                                    _ageController.text,
-                                    _sexController.text,
-                                    _sexController.text,
-                                    userType);
-                              }
+                              // if (_formKey.currentState!.validate()) {
+                              //   signUp(
+                              //       _emailController.text,
+                              //       _confirmPasswordController.text,
+                              //       _nameController.text,
+                              //       _ageController.text,
+                              //       _sexController.text,
+                              //       _sexController.text,
+                              //       userType);
+                              // }
+                              Get.to(() => const UserOtpPage());
                             },
                             child: Text("Register",
                                 style: GoogleFonts.poppins(fontSize: 20)),
@@ -202,7 +204,45 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       'contact_number': _contactNumberController.text,
       'role': userType
     });
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const LoginPage()));
+
+    Get.offAll(() => const HomePage());
+  }
+}
+
+class UserOtpPage extends StatefulWidget {
+  const UserOtpPage({super.key});
+
+  @override
+  State<UserOtpPage> createState() => _UserOtpPageState();
+}
+
+class _UserOtpPageState extends State<UserOtpPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('OTP Verification'),
+      ),
+      body: Center(
+        child: Card(
+          child: Container(
+            padding: const EdgeInsets.all(32.0),
+            constraints: const BoxConstraints(maxWidth: 370),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    'Verify your phone number',
+                    style: GoogleFonts.poppins(fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

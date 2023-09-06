@@ -1,5 +1,5 @@
-import 'package:denguecare_firebase/main.dart';
 import 'package:denguecare_firebase/utility/utils.dart';
+import 'package:denguecare_firebase/views/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -158,6 +158,6 @@ class _LoginPageState extends State<LoginPage> {
       Utils.showSnackBar(e.message);
     }
 
-    navigatorKey.currentState!.popUntil((route) => route.isFirst);
+    Get.offAll(() => const HomePage());
   }
 }
