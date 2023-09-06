@@ -1,18 +1,23 @@
 import 'package:denguecare_firebase/views/home_page.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:otp_text_field/otp_field.dart';
+import 'package:otp_text_field/style.dart';
 import '../../utility/utils.dart';
 import '../login_page.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_confirmpass_widget.dart';
 import '../widgets/input_email_widget.dart';
 import '../widgets/input_widget.dart';
+import 'dart:async';
+
+// Define a Timer variable
+late Timer _resendOTPTimer;
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -36,7 +41,9 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   bool _isPasswordNotVisible = true;
   final _formKey = GlobalKey<FormState>();
   final String userType = 'User';
-
+  var verificationId = ''.obs;
+  int _remainingTime = 60;
+  String _otpCode = '';
   @override
   void dispose() {
     _emailController.dispose();
@@ -139,7 +146,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               //       _sexController.text,
                               //       userType);
                               // }
-                              Get.to(() => const UserOtpPage());
+                              _showOTPDialog(context);
                             },
                             child: Text("Register",
                                 style: GoogleFonts.poppins(fontSize: 20)),
@@ -167,7 +174,97 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       ),
     );
   }
+//! SHOWDIALOG POP UP
 
+  void _showOTPDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return _cardOTPDialog();
+      },
+    );
+  }
+
+  Widget _cardOTPDialog() {
+    return AlertDialog(
+      title: Text(
+        'Verify your phone number',
+        style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      content: Card(
+        child: Container(
+          padding: const EdgeInsets.all(32.0),
+          constraints: const BoxConstraints(maxWidth: 370),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    'Verify your phone number',
+                    style: GoogleFonts.poppins(fontSize: 18),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'A 6-digit OTP code is sent to your phone',
+                    style: GoogleFonts.poppins(fontSize: 12),
+                  ),
+                  const SizedBox(height: 20),
+                  OTPTextField(
+                    length: 6,
+                    width: MediaQuery.of(context).size.width,
+                    style: GoogleFonts.poppins(fontSize: 18),
+                    textFieldAlignment: MainAxisAlignment.spaceAround,
+                    fieldStyle: FieldStyle.underline,
+                    inputFormatter: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onCompleted: (pin) {
+                      _otpCode = pin;
+                      print(_otpCode);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Time Left: $_remainingTime seconds',
+                    style: GoogleFonts.poppins(fontSize: 12),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 15,
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: Text("Confirm",
+                          style: GoogleFonts.poppins(fontSize: 20)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Close'),
+        ),
+      ],
+    );
+  }
+
+//! SIGN UP
   void signUp(String email, String password, String name, String age,
       String sex, String contactnumber, String userType) async {
     try {
@@ -207,42 +304,85 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
     Get.offAll(() => const HomePage());
   }
-}
 
-class UserOtpPage extends StatefulWidget {
-  const UserOtpPage({super.key});
-
-  @override
-  State<UserOtpPage> createState() => _UserOtpPageState();
-}
-
-class _UserOtpPageState extends State<UserOtpPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('OTP Verification'),
-      ),
-      body: Center(
-        child: Card(
-          child: Container(
-            padding: const EdgeInsets.all(32.0),
-            constraints: const BoxConstraints(maxWidth: 370),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Verify your phone number',
-                    style: GoogleFonts.poppins(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+//!FOR OTP
+  Future<void> sendOTP(String phoneNumber) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (credential) {
+        // Automatically handled on some devices
+      },
+      verificationFailed: (e) {
+        Utils.showSnackBar(e.message);
+      },
+      codeSent: (verificationId, resendToken) {
+        this.verificationId.value = verificationId;
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        this.verificationId.value = verificationId;
+      },
     );
+  }
+
+  Future<void> verifyOTP(String verificationId, String otp) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: otp,
+    );
+
+    try {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      // User is successfully authenticated.
+    } on FirebaseAuthException catch (e) {
+      Utils.showSnackBar(e.message);
+    }
+  }
+
+  void startResendOTPTimer() {
+    const duration = Duration(minutes: 1); // Adjust the duration as needed
+    _resendOTPTimer = Timer(duration, () {
+      setState(() {
+        if (_remainingTime > 0) {
+          _remainingTime--;
+        } else {
+          // Time is up, stop the timer
+          cancelResendOTPTimer();
+        }
+      });
+      // Automatically resend OTP after the timer expires
+      sendOTP(_contactNumberController
+          .text); // Replace userPhoneNumber with the actual phone number
+    });
+  }
+
+// Function to cancel the timer
+  void cancelResendOTPTimer() {
+    if (_resendOTPTimer.isActive) {
+      _resendOTPTimer.cancel();
+    }
+  }
+
+  // Function to initiate OTP verification and start the timer
+  Future<void> initiateOTPVerification(String phoneNumber) async {
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) {
+          // Automatically handled on some devices
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          // Handle verification failure
+        },
+        codeSent: (String verificationId, resendToken) {
+          // Store verificationId and resendToken
+          startResendOTPTimer(); // Start the timer when OTP is sent
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Handle timeout
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      Utils.showSnackBar(e.message);
+    }
   }
 }

@@ -158,6 +158,6 @@ class _LoginPageState extends State<LoginPage> {
       Utils.showSnackBar(e.message);
     }
 
-    Get.offAll(() => const HomePage());
+    Get.offAll(() => const UserMainPage());
   }
 }
