@@ -24,7 +24,7 @@ class InputContactNumber extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
         inputFormatters: [
-          LengthLimitingTextInputFormatter(11),
+          LengthLimitingTextInputFormatter(10),
           FilteringTextInputFormatter.digitsOnly,
         ],
         validator: (value) {
@@ -34,6 +34,7 @@ class InputContactNumber extends StatelessWidget {
           return null;
         },
         obscureText: obscureText,
+
         controller: controller,
         decoration: InputDecoration(
           border: InputBorder.none,

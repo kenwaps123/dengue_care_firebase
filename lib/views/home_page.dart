@@ -12,7 +12,26 @@ class HomePage extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TEST'),
+        title: const Text('Homepage'),
+        actions: <Widget>[
+          PopupMenuButton<int>(
+            padding: EdgeInsets.zero,
+            onSelected: (item) => handleClick(item),
+            itemBuilder: (context) => [
+              const PopupMenuItem<int>(
+                value: 1,
+                child: ListTile(
+                  leading: Icon(
+                    Icons.info,
+                    color: Colors.black,
+                    size: 26,
+                  ),
+                  title: Text('About'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -20,21 +39,21 @@ class HomePage extends StatelessWidget {
           children: [
             Text(user.email!),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => FirebaseAuth.instance.signOut(),
-              icon: const Icon(
-                Icons.arrow_back,
-                size: 32,
-              ),
-              label: const Text('Signout'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-              ),
-            ),
           ],
         ),
       ),
     );
+  }
+
+  void handleClick(int item) {
+    switch (item) {
+      case 0:
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+    }
   }
 }
 

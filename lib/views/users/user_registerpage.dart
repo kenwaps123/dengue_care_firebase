@@ -1,3 +1,4 @@
+import 'package:denguecare_firebase/utility/utils_success.dart';
 import 'package:denguecare_firebase/views/home_page.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +99,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                         const SizedBox(height: 20),
                         InputContactNumber(
-                            hintText: "Contact Number (11-digit)",
+                            hintText: "Contact Number (10-digit)",
                             controller: _contactNumberController,
                             obscureText: false),
                         const SizedBox(height: 20),
@@ -135,18 +136,14 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                                 vertical: 15,
                               ),
                             ),
-                            onPressed: () {
-                              // if (_formKey.currentState!.validate()) {
-                              //   signUp(
-                              //       _emailController.text,
-                              //       _confirmPasswordController.text,
-                              //       _nameController.text,
-                              //       _ageController.text,
-                              //       _sexController.text,
-                              //       _sexController.text,
-                              //       userType);
-                              // }
-                              _showOTPDialog(context);
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                _contactNumberController.text =
+                                    "+63${_contactNumberController.text}";
+                                _showOTPDialog(context);
+                                initiateOTPVerification(
+                                    _contactNumberController.text);
+                              }
                             },
                             child: Text("Register",
                                 style: GoogleFonts.poppins(fontSize: 20)),
@@ -242,7 +239,13 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                           vertical: 15,
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        if (_otpCode.isNotEmpty) {
+                          verifyOTP(verificationId.value, _otpCode);
+                        } else {
+                          Utils.showSnackBar("Please enter the OTP code.");
+                        }
+                      },
                       child: Text("Confirm",
                           style: GoogleFonts.poppins(fontSize: 20)),
                     ),
@@ -310,12 +313,13 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (credential) {
-        // Automatically handled on some devices
+        UtilSuccess.showSnackBar("Verification Success");
       },
       verificationFailed: (e) {
         Utils.showSnackBar(e.message);
       },
       codeSent: (verificationId, resendToken) {
+        startResendOTPTimer();
         this.verificationId.value = verificationId;
       },
       codeAutoRetrievalTimeout: (verificationId) {
@@ -340,7 +344,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
   void startResendOTPTimer() {
     const duration = Duration(minutes: 1); // Adjust the duration as needed
-    _resendOTPTimer = Timer(duration, () {
+    _resendOTPTimer = Timer.periodic(duration, (Timer timer) {
       setState(() {
         if (_remainingTime > 0) {
           _remainingTime--;
@@ -349,10 +353,10 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
           cancelResendOTPTimer();
         }
       });
-      // Automatically resend OTP after the timer expires
-      sendOTP(_contactNumberController
-          .text); // Replace userPhoneNumber with the actual phone number
     });
+
+    // Optionally, you can immediately decrement the remaining time
+    // by one to start the countdown.
   }
 
 // Function to cancel the timer
