@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/utility/utils.dart';
+import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:denguecare_firebase/views/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final List<String> _userTypes = ['User', 'Admin'];
   bool _isPasswordNotVisible = true;
   final _formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     emailController.dispose();
@@ -151,13 +154,35 @@ class _LoginPageState extends State<LoginPage> {
           child: CircularProgressIndicator(),
         ),
       );
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim());
+
+      route();
+      Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       Utils.showSnackBar(e.message);
+      Navigator.of(context).pop();
     }
-
-    Get.offAll(() => const UserMainPage());
   }
+}
+
+void route() {
+  User? user = FirebaseAuth.instance.currentUser;
+  var kk = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user!.uid)
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+    if (documentSnapshot.exists) {
+      if (documentSnapshot.get('role') == "Admin") {
+        Get.offAll(() => const AdminHomePage());
+      } else {
+        Get.offAll(() => const UserMainPage());
+      }
+    } else {
+      Utils.showSnackBar('Document does not exist on the database');
+    }
+  });
 }

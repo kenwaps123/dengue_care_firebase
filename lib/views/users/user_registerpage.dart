@@ -17,9 +17,6 @@ import '../widgets/input_email_widget.dart';
 import '../widgets/input_widget.dart';
 import 'dart:async';
 
-// Define a Timer variable
-late Timer _resendOTPTimer;
-
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
 
@@ -42,9 +39,9 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   bool _isPasswordNotVisible = true;
   final _formKey = GlobalKey<FormState>();
   final String userType = 'User';
-  var verificationId = ''.obs;
-  int _remainingTime = 60;
-  String _otpCode = '';
+  var _verificationId = ''.obs;
+  final int _remainingTime = 60;
+  var _otpCode;
   @override
   void dispose() {
     _emailController.dispose();
@@ -137,12 +134,15 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               ),
                             ),
                             onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                _contactNumberController.text =
-                                    "+63${_contactNumberController.text}";
-                                _showOTPDialog(context);
-                                initiateOTPVerification(
-                                    _contactNumberController.text);
+                              try {
+                                if (_formKey.currentState!.validate()) {
+                                  String num =
+                                      "+63${_contactNumberController.text}";
+                                  _showOTPDialog(context);
+                                  verifyPhone(num);
+                                }
+                              } on FirebaseAuthException catch (e) {
+                                Utils.showSnackBar(e.message);
                               }
                             },
                             child: Text("Register",
@@ -220,7 +220,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                     ],
                     onCompleted: (pin) {
                       _otpCode = pin;
-                      print(_otpCode);
+                      //print(_otpCode);
                     },
                   ),
                   const SizedBox(height: 20),
@@ -240,10 +240,29 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                       ),
                       onPressed: () async {
-                        if (_otpCode.isNotEmpty) {
-                          verifyOTP(verificationId.value, _otpCode);
-                        } else {
-                          Utils.showSnackBar("Please enter the OTP code.");
+                        // if (_otpCode.isNotEmpty) {
+                        // } else {
+                        //   Utils.showSnackBar("Please enter the OTP code.");
+                        // }
+                        try {
+                          PhoneAuthCredential credential =
+                              PhoneAuthProvider.credential(
+                            verificationId: _verificationId.value,
+                            smsCode: _otpCode,
+                          );
+                          await _auth.signInWithCredential(credential);
+                          signUp(
+                              _emailController.text.trim(),
+                              _confirmPasswordController.text.trim(),
+                              _nameController.text.trim(),
+                              _ageController.text.trim(),
+                              _sexController.text.trim(),
+                              _contactNumberController.text.trim(),
+                              userType);
+                          UtilSuccess.showSnackBar("Success");
+                          // Handle user registration completion
+                        } on FirebaseAuthException catch (e) {
+                          Utils.showSnackBar(e.message);
                         }
                       },
                       child: Text("Confirm",
@@ -287,7 +306,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
         Utils.showSnackBar(e.message);
       });
     } on FirebaseAuthException catch (e) {
-      print(e);
+      //print(e);
       Utils.showSnackBar(e.message);
     }
   }
@@ -305,88 +324,36 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       'role': userType
     });
 
-    Get.offAll(() => const HomePage());
+    Get.offAll(() => const UserMainPage());
   }
 
-//!FOR OTP
-  Future<void> sendOTP(String phoneNumber) async {
-    await FirebaseAuth.instance.verifyPhoneNumber(
+  Future<void> verifyPhone(String phoneNumber) async {
+    verificationCompleted(PhoneAuthCredential credential) async {
+      await _auth.signInWithCredential(credential);
+
+      // Handle user registration completion
+    }
+
+    verificationFailed(FirebaseAuthException e) {
+      // Handle verification failure
+      Utils.showSnackBar(e.message);
+    }
+
+    codeSent(String verificationId, [int? resendToken]) async {
+      // Store the verification ID
+      _verificationId = verificationId.obs;
+    }
+
+    codeAutoRetrievalTimeout(String verificationId) {
+      // Auto retrieval timeout, handle it if needed
+    }
+
+    await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
-      verificationCompleted: (credential) {
-        UtilSuccess.showSnackBar("Verification Success");
-      },
-      verificationFailed: (e) {
-        Utils.showSnackBar(e.message);
-      },
-      codeSent: (verificationId, resendToken) {
-        startResendOTPTimer();
-        this.verificationId.value = verificationId;
-      },
-      codeAutoRetrievalTimeout: (verificationId) {
-        this.verificationId.value = verificationId;
-      },
+      verificationCompleted: verificationCompleted,
+      verificationFailed: verificationFailed,
+      codeSent: codeSent,
+      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
     );
-  }
-
-  Future<void> verifyOTP(String verificationId, String otp) async {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: otp,
-    );
-
-    try {
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      // User is successfully authenticated.
-    } on FirebaseAuthException catch (e) {
-      Utils.showSnackBar(e.message);
-    }
-  }
-
-  void startResendOTPTimer() {
-    const duration = Duration(minutes: 1); // Adjust the duration as needed
-    _resendOTPTimer = Timer.periodic(duration, (Timer timer) {
-      setState(() {
-        if (_remainingTime > 0) {
-          _remainingTime--;
-        } else {
-          // Time is up, stop the timer
-          cancelResendOTPTimer();
-        }
-      });
-    });
-
-    // Optionally, you can immediately decrement the remaining time
-    // by one to start the countdown.
-  }
-
-// Function to cancel the timer
-  void cancelResendOTPTimer() {
-    if (_resendOTPTimer.isActive) {
-      _resendOTPTimer.cancel();
-    }
-  }
-
-  // Function to initiate OTP verification and start the timer
-  Future<void> initiateOTPVerification(String phoneNumber) async {
-    try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) {
-          // Automatically handled on some devices
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          // Handle verification failure
-        },
-        codeSent: (String verificationId, resendToken) {
-          // Store verificationId and resendToken
-          startResendOTPTimer(); // Start the timer when OTP is sent
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout
-        },
-      );
-    } on FirebaseAuthException catch (e) {
-      Utils.showSnackBar(e.message);
-    }
   }
 }

@@ -3,6 +3,9 @@ import 'package:denguecare_firebase/views/users/user_report_page.dart';
 import 'package:denguecare_firebase/views/users/user_settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,15 +21,19 @@ class HomePage extends StatelessWidget {
             padding: EdgeInsets.zero,
             onSelected: (item) => handleClick(item),
             itemBuilder: (context) => [
-              const PopupMenuItem<int>(
+              PopupMenuItem<int>(
                 value: 1,
                 child: ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.info,
                     color: Colors.black,
                     size: 26,
                   ),
-                  title: Text('About'),
+                  title: const Text('About'),
+                  onTap: () {
+                    FirebaseAuth.instance.signOut();
+                    Get.offAll(() => const LoginPage());
+                  },
                 ),
               ),
             ],
