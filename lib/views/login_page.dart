@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/utility/utils.dart';
 import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
-import 'package:denguecare_firebase/views/home_page.dart';
+import 'package:denguecare_firebase/views/users/user_homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,8 +20,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String _selectedUserType = 'User';
-  final List<String> _userTypes = ['User', 'Admin'];
   bool _isPasswordNotVisible = true;
   final _formKey = GlobalKey<FormState>();
 
@@ -40,9 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: const Color.fromARGB(255, 118, 162, 120),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Form(
               key: _formKey,
               child: Card(
@@ -56,24 +52,6 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Image.asset('images/logo-no-background.png'),
                         const SizedBox(height: 20),
-                        const SizedBox(height: 20),
-                        DropdownButtonFormField<String>(
-                          value: _selectedUserType,
-                          items: _userTypes.map((String userType) {
-                            return DropdownMenuItem<String>(
-                              value: userType,
-                              child: Text(
-                                userType,
-                                style: GoogleFonts.poppins(fontSize: 16),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedUserType = value!;
-                            });
-                          },
-                        ),
                         const SizedBox(height: 20),
                         InputEmailWidget(
                           hintText: "Email",
@@ -120,17 +98,14 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        Visibility(
-                          visible: _selectedUserType == "User",
-                          child: InkWell(
-                            onTap: () {
-                              Get.to(() => const UserRegisterPage());
-                            },
-                            child: Text(
-                              "Don't have an account? Sign up now!",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12, color: Colors.blue),
-                            ),
+                        InkWell(
+                          onTap: () {
+                            Get.to(() => const UserRegisterPage());
+                          },
+                          child: Text(
+                            "Don't have an account? Sign up now!",
+                            style: GoogleFonts.poppins(
+                                fontSize: 11, color: Colors.blue),
                           ),
                         )
                       ],
@@ -177,7 +152,7 @@ void route() {
       .then((DocumentSnapshot documentSnapshot) {
     if (documentSnapshot.exists) {
       if (documentSnapshot.get('role') == "Admin") {
-        Get.offAll(() => const AdminHomePage());
+        Get.offAll(() => const AdminMainPage());
       } else {
         Get.offAll(() => const UserMainPage());
       }

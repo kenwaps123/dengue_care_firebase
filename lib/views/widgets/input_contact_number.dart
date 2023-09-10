@@ -39,7 +39,7 @@ class InputContactNumber extends StatelessWidget {
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
-          hintStyle: GoogleFonts.poppins(),
+          hintStyle: GoogleFonts.poppins(fontSize: 14),
         ), // contentPadding: const EdgeInsets.symmetric(horizontal: 20)),
       ),
     );

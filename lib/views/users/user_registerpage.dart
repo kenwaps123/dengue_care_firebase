@@ -1,5 +1,5 @@
 import 'package:denguecare_firebase/utility/utils_success.dart';
-import 'package:denguecare_firebase/views/home_page.dart';
+import 'package:denguecare_firebase/views/users/user_homepage.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,23 +59,26 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 118, 162, 120),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Card(
-                child: Container(
-                  padding: const EdgeInsets.all(32.0),
-                  constraints: const BoxConstraints(maxWidth: 370),
-                  child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Form(
+                key: _formKey,
+                child: Card(
+                  child: Container(
+                    padding: const EdgeInsets.all(32.0),
+                    constraints: const BoxConstraints(maxWidth: 370),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset('images/logo-no-background.png'),
                         const SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        Text(
+                          "USER REGISTRATION",
+                          style: GoogleFonts.poppins(fontSize: 18),
+                        ),
                         const SizedBox(height: 20),
                         InputWidget(
                           hintText: "Name",

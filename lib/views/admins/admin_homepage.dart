@@ -6,6 +6,9 @@ import 'dart:math' as math;
 import 'package:get/get.dart';
 
 import '../login_page.dart';
+import 'admin_dataviz.dart';
+import 'admin_dengueheatmap.dart';
+import 'admin_reportpage.dart';
 
 showLogoutConfirmationDialog(BuildContext context) async {
   return showDialog(
@@ -42,6 +45,8 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
+  int currentIndex = 0;
+
   static const _actionTitles = [
     'Edit Posts',
     'Create announcement',
@@ -189,6 +194,29 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 }
+
+const _navBarItemsAdmin = [
+  NavigationDestination(
+    icon: Icon(Icons.home_outlined),
+    selectedIcon: Icon(Icons.home_rounded),
+    label: 'Home',
+  ),
+  NavigationDestination(
+    icon: Icon(Icons.report_outlined),
+    selectedIcon: Icon(Icons.report_rounded),
+    label: 'Report',
+  ),
+  NavigationDestination(
+    icon: Icon(Icons.map_outlined),
+    selectedIcon: Icon(Icons.map_rounded),
+    label: 'Map',
+  ),
+  NavigationDestination(
+    icon: Icon(Icons.auto_graph_outlined),
+    selectedIcon: Icon(Icons.auto_graph_rounded),
+    label: 'Data Analytics',
+  ),
+];
 
 void handleClick(int item) {
   switch (item) {
@@ -430,4 +458,38 @@ class FakeItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class AdminMainPage extends StatefulWidget {
+  const AdminMainPage({super.key});
+
+  @override
+  State<AdminMainPage> createState() => _AdminMainPageState();
+}
+
+class _AdminMainPageState extends State<AdminMainPage> {
+  int currentIndex = 0;
+  final screens = [
+    const AdminHomePage(),
+    const AdminReportPage(),
+    const AdminDengueHeatMapPage(),
+    const AdminDataVizPage(),
+  ];
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: IndexedStack(
+          index: currentIndex,
+          children: screens,
+        ),
+        bottomNavigationBar: NavigationBar(
+          animationDuration: const Duration(seconds: 1),
+          selectedIndex: currentIndex,
+          onDestinationSelected: (index) {
+            setState(() {
+              currentIndex = index;
+            });
+          },
+          destinations: _navBarItemsAdmin,
+        ),
+      );
 }

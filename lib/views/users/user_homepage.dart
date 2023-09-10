@@ -5,10 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'login_page.dart';
+import '../login_page.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class UserHomePage extends StatelessWidget {
+  const UserHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class UserMainPage extends StatefulWidget {
 class _UserMainPageState extends State<UserMainPage> {
   int currentIndex = 0;
   final screens = [
-    const HomePage(),
+    const UserHomePage(),
     const UserDengueHeatMapPage(),
     const UserReportPage(),
     const UserSettingsPage(),

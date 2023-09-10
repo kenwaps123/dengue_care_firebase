@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:denguecare_firebase/views/login_page.dart';
-import 'package:denguecare_firebase/views/home_page.dart';
+import 'package:denguecare_firebase/views/users/user_homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -38,11 +40,66 @@ class MainPage extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return const HomePage();
+              return const RouterWidget();
             } else {
-              return const LoginPage();
+              return Utils.showSnackBar(
+                  'Document does not exist on the database');
             }
           },
         ),
       );
+}
+
+// void router() {
+//   User? user = FirebaseAuth.instance.currentUser;
+//   var kk = FirebaseFirestore.instance
+//       .collection('users')
+//       .doc(user!.uid)
+//       .get()
+//       .then((DocumentSnapshot documentSnapshot) {
+//     if (documentSnapshot.exists) {
+//       if (documentSnapshot.get('role') == "Admin") {
+//         return const AdminHomePage();
+//       } else if (documentSnapshot.get('role') == "User") {
+//         return const UserMainPage();
+//       }
+//     } else {
+//       return const LoginPage();
+//     }
+//   });
+// }
+
+class RouterWidget extends StatelessWidget {
+  const RouterWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<DocumentSnapshot>(
+      future: getUserRole(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // You can return a loading indicator here if needed
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final role = snapshot.data?.get('role') ?? '';
+
+          switch (role) {
+            case 'Admin':
+              return const AdminMainPage();
+            case 'User':
+              return const UserMainPage();
+            default:
+              return const LoginPage();
+          }
+        }
+      },
+    );
+  }
+
+  Future<DocumentSnapshot> getUserRole() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    return FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+  }
 }
