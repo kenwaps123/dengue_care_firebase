@@ -41,6 +41,12 @@ dependencies:
   get: ^4.6.5
   cloud_firestore: ^4.9.1
   otp_text_field: ^1.1.3
+  flutter_map: ^5.0.0
+  latlong2: ^0.9.0
+  syncfusion_flutter_maps: ^22.2.12
+  mapbox_gl: ^0.16.0
+  mapbox_maps_flutter: ^0.4.4
+  permission_handler: ^11.0.0
 
 dev_dependencies:
   flutter_test:

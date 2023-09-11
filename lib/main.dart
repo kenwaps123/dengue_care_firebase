@@ -8,10 +8,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'firebase_options.dart';
 import 'utility/utils.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  MapWidget(
+    resourceOptions: ResourceOptions(
+        accessToken:
+            "pk.eyJ1IjoicmFkb29vMTIzMyIsImEiOiJjbG1leGMzcDUxY3M1M3BqcjA2cW54MzNnIn0.bPXRrLqk3bwMKvKnJdiCyA"),
+  );
   runApp(const MyApp());
 }
 
@@ -78,7 +84,7 @@ class RouterWidget extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // You can return a loading indicator here if needed
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {

@@ -306,7 +306,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                     email, name, age, sex, contactnumber, userType)
               })
           .catchError((e) {
-        Utils.showSnackBar(e.message);
+        return Utils.showSnackBar(e.message);
       });
     } on FirebaseAuthException catch (e) {
       //print(e);
