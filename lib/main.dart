@@ -42,8 +42,7 @@ class MainPage extends StatelessWidget {
             if (snapshot.hasData) {
               return const RouterWidget();
             } else {
-              return Utils.showSnackBar(
-                  'Document does not exist on the database');
+              return const LoginPage();
             }
           },
         ),
