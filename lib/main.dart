@@ -8,16 +8,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'firebase_options.dart';
 import 'utility/utils.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  MapWidget(
-    resourceOptions: ResourceOptions(
-        accessToken:
-            "pk.eyJ1IjoicmFkb29vMTIzMyIsImEiOiJjbG1leGMzcDUxY3M1M3BqcjA2cW54MzNnIn0.bPXRrLqk3bwMKvKnJdiCyA"),
-  );
+
   runApp(const MyApp());
 }
 

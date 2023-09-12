@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('images/logo-no-background.png'),
+                        Image.asset('assets/images/logo-no-background.png'),
                         const SizedBox(height: 20),
                         const SizedBox(height: 20),
                         InputEmailWidget(
