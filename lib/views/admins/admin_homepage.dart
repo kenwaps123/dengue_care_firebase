@@ -1,3 +1,4 @@
+import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -94,7 +95,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   Icons.person,
                   color: Colors.black,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Get.offAll(() => const AdminAccountSettings());
+                },
               ),
               ListTile(
                 title: const Text('Manage Admins'),
