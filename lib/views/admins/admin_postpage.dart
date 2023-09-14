@@ -41,7 +41,7 @@ class _AdminPostPageState extends State<AdminPostPage> {
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: '',
+                      labelText: 'Title',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -64,7 +64,9 @@ class _AdminPostPageState extends State<AdminPostPage> {
                             child: ElevatedButton.icon(
                               icon: const Icon(
                                   Icons.add_photo_alternate_outlined),
-                              onPressed: () {},
+                              onPressed: () {
+                                imgPickUpload();
+                              },
                               label: const Text('Upload an image'),
                             ),
                           ),
