@@ -1,4 +1,5 @@
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
+import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -188,7 +189,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
               icon: const Icon(Icons.announcement),
             ),
             ActionButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.offAll(() => const AdminPostPage());
+              },
               icon: const Icon(Icons.add_box),
             ),
           ],

@@ -21,7 +21,7 @@ class _AdminAccountSettingsState extends State<AdminAccountSettings> {
         title: const Text("Account Settings"),
         leading: BackButton(
           onPressed: () {
-            Get.offAll(() => const AdminHomePage());
+            Get.offAll(() => const AdminMainPage());
           },
         ),
       ),
