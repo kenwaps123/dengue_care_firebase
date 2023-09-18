@@ -1,16 +1,22 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/utility/utils_success.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../utility/utils.dart';
 import 'admin_homepage.dart';
 
 String imageUrl = '';
 String userName = '';
+final TextEditingController _titleController = TextEditingController();
+final TextEditingController _contentController = TextEditingController();
+File? _selectedImage;
+File? image;
 
 class AdminPostPage extends StatefulWidget {
   const AdminPostPage({super.key});
@@ -28,9 +34,16 @@ class _AdminPostPageState extends State<AdminPostPage> {
         leading: BackButton(
           onPressed: () {
             Get.offAll(() => const AdminMainPage());
+            clearAllInputs();
           },
         ),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.check))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                postUpload();
+              },
+              icon: const Icon(Icons.check))
+        ],
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -39,7 +52,20 @@ class _AdminPostPageState extends State<AdminPostPage> {
             child: Center(
               child: Column(
                 children: [
+                  _selectedImage != null
+                      ? Image.file(
+                          _selectedImage!,
+                          width: 350,
+                          height: 350,
+                          fit: BoxFit.cover,
+                        )
+                      : const Placeholder(
+                          fallbackHeight: 300,
+                          fallbackWidth: 300,
+                        ),
+                  const SizedBox(height: 20),
                   TextFormField(
+                    controller: _titleController,
                     decoration: const InputDecoration(
                       labelText: 'Title',
                       border: OutlineInputBorder(),
@@ -47,6 +73,7 @@ class _AdminPostPageState extends State<AdminPostPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: _contentController,
                     keyboardType: TextInputType.multiline,
                     maxLines: 4,
                     decoration: const InputDecoration(
@@ -82,6 +109,58 @@ class _AdminPostPageState extends State<AdminPostPage> {
       ),
     );
   }
+
+  void clearAllInputs() {
+    setState(() {
+      _titleController.clear();
+      _contentController.clear();
+      // other input resets if any
+      _selectedImage = null;
+      imageUrl = '';
+    });
+  }
+
+  void imgPickUpload() async {
+    final ImagePicker picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    try {
+      if (pickedFile != null) {
+        image = File(pickedFile.path);
+
+        setState(() {
+          _selectedImage = image;
+        });
+      }
+    } catch (e) {
+      Utils.showSnackBar(e.toString());
+    }
+  }
+
+  void postUpload() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+
+    try {
+      String imageName = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference ref = FirebaseStorage.instance.ref().child('images/$imageName');
+      UploadTask uploadTask = ref.putFile(image!);
+      TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
+      imageUrl = await snapshot.ref.getDownloadURL();
+
+      FirebaseFirestore.instance.collection('posts').add({
+        'imageUrl': imageUrl,
+        'caption': _titleController.text.trim(),
+        'postDetails': _contentController.text.trim(),
+        'uploaderEmail':
+            user!.email, // Assuming the displayName is set for Firebase user.
+        'uploaderUID': user.uid,
+      });
+      UtilSuccess.showSnackBar('Success!');
+    } catch (e) {
+      Utils.showSnackBar(e.toString());
+    }
+  }
 }
 
 Future<String> retrieveName() async {
@@ -100,32 +179,4 @@ Future<String> retrieveName() async {
   } else {
     return ''; // Handle the case when 'name' field is missing
   }
-}
-
-void imgPickUpload() async {
-  final ImagePicker picker = ImagePicker();
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-  if (pickedFile != null) {
-    File image = File(pickedFile.path);
-    Reference ref =
-        FirebaseStorage.instance.ref().child('images/your_image_name.jpg');
-    UploadTask uploadTask = ref.putFile(image);
-    TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
-    imageUrl = await snapshot.ref.getDownloadURL();
-  }
-}
-
-void postUpload() {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final user = auth.currentUser;
-
-  FirebaseFirestore.instance.collection('posts').add({
-    'imageUrl': imageUrl,
-    'caption': 'Your caption',
-    'postDetails': 'Details',
-    'uploaderName':
-        user!.displayName, // Assuming the displayName is set for Firebase user.
-    'uploaderUID': user.uid
-  });
 }

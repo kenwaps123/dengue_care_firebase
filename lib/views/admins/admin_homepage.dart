@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
 import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:get/get.dart';
 
+import '../../utility/utils.dart';
 import '../login_page.dart';
 import 'admin_dataviz.dart';
 import 'admin_dengueheatmap.dart';
@@ -185,7 +187,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
               icon: const Icon(Icons.edit),
             ),
             ActionButton(
-              onPressed: () {},
+              onPressed: () {
+                listenToPosts();
+              },
               icon: const Icon(Icons.announcement),
             ),
             ActionButton(
@@ -198,6 +202,19 @@ class _AdminHomePageState extends State<AdminHomePage> {
         ),
       ),
     );
+  }
+
+  void listenToPosts() {
+    FirebaseFirestore.instance.collection('posts').snapshots().listen(
+        (snapshot) {
+      List<DocumentSnapshot> documents = snapshot.docs;
+      for (DocumentSnapshot doc in documents) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        print(data);
+      }
+    }, onError: (e) {
+      Utils.showSnackBar(e.toString());
+    });
   }
 }
 
