@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PostsList extends StatefulWidget {
   const PostsList({super.key});
@@ -42,7 +43,13 @@ class _PostsListState extends State<PostsList> {
               width: double.infinity,
               child: Column(
                 children: <Widget>[
-                  Image.network(data['imageUrl']),
+                  CachedNetworkImage(
+                    imageUrl: data['imageUrl'],
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
                   const SizedBox(height: 8.0),
                   Text(data['caption']),
                   const SizedBox(height: 8.0),
