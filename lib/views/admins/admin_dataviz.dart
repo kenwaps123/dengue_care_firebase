@@ -27,6 +27,7 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
             _pickAndUploadFile();
           }
           if (status == PermissionStatus.denied) {
+            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text("this persdkfsf")));
           }

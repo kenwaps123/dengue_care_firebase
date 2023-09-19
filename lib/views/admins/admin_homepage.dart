@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
 import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
+import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -144,41 +145,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             ],
           ),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: (() {}),
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        spreadRadius: 2,
-                        blurRadius: 2,
-                        offset: Offset(2, 2),
-                      ),
-                    ],
-                  ),
-                  width: double.infinity,
-                  child: const Column(
-                    children: [
-                      //Image.asset('images/dengue4s.jpg'),
-                      ListTile(
-                        title: Text('Mag 4S tayo!'),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        body: const PostsList(),
         floatingActionButton: ExpandableFab(
           distance: 112,
           children: [
