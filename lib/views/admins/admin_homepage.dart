@@ -465,14 +465,26 @@ class _AdminMainPageState extends State<AdminMainPage> {
     const AdminDengueHeatMapPage(),
     const AdminDataVizPage(),
   ];
+  Widget _getCurrentScreen() {
+    switch (currentIndex) {
+      case 0:
+        return const AdminHomePage();
+      case 1:
+        return const AdminReportPage();
+      case 2:
+        return const AdminDengueHeatMapPage();
+      case 3:
+        return const AdminDataVizPage();
+      default:
+        return const AdminHomePage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: IndexedStack(
-          index: currentIndex,
-          children: screens,
-        ),
+        body: _getCurrentScreen(),
         bottomNavigationBar: NavigationBar(
-          animationDuration: const Duration(seconds: 1),
+          animationDuration: const Duration(seconds: 2),
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
             setState(() {

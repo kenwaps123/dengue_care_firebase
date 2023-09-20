@@ -1,6 +1,7 @@
 import 'package:denguecare_firebase/views/users/user_dengueheatmap.dart';
 import 'package:denguecare_firebase/views/users/user_report_page.dart';
 import 'package:denguecare_firebase/views/users/user_settings_page.dart';
+import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,15 +41,7 @@ class UserHomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(user.email!),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+      body: const PostsList(),
     );
   }
 
@@ -79,13 +72,25 @@ class _UserMainPageState extends State<UserMainPage> {
     const UserReportPage(),
     const UserSettingsPage(),
   ];
+  Widget _getCurrentScreen() {
+    switch (currentIndex) {
+      case 0:
+        return const UserHomePage();
+      case 1:
+        return const UserDengueHeatMapPage();
+      case 2:
+        return const UserReportPage();
+      case 3:
+        return const UserSettingsPage();
+      default:
+        return const UserHomePage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: screens,
-      ),
+      body: _getCurrentScreen(),
       bottomNavigationBar: NavigationBar(
         animationDuration: const Duration(seconds: 1),
         selectedIndex: currentIndex,

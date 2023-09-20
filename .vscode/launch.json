@@ -9,7 +9,7 @@
             "name": "denguecare_firebase",
             "request": "launch",
             "type": "dart",
-            "args": ["--dart-define", "ACCESS_TOKEN=pk.eyJ1IjoicmFkb29vMTIzMyIsImEiOiJjbG1leGMzcDUxY3M1M3BqcjA2cW54MzNnIn0.bPXRrLqk3bwMKvKnJdiCyA"],
+           // "args": ["--dart-define", "ACCESS_TOKEN=pk.eyJ1IjoicmFkb29vMTIzMyIsImEiOiJjbG1leGMzcDUxY3M1M3BqcjA2cW54MzNnIn0.bPXRrLqk3bwMKvKnJdiCyA"],
             
         },
         {

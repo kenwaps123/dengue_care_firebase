@@ -10,6 +10,7 @@ class AdminDengueHeatMapPage extends StatefulWidget {
 
 class _AdminDengueHeatMapPageState extends State<AdminDengueHeatMapPage> {
   late MapboxMapController controller;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +24,8 @@ class _AdminDengueHeatMapPageState extends State<AdminDengueHeatMapPage> {
               target: LatLng(7.113932, 125.624737),
               zoom: 17,
             ),
-            accessToken: const String.fromEnvironment("ACCESS_TOKEN"),
+            accessToken:
+                'pk.eyJ1IjoicmFkb29vMTIzMyIsImEiOiJjbG1leGMzcDUxY3M1M3BqcjA2cW54MzNnIn0.bPXRrLqk3bwMKvKnJdiCyA',
           ),
           Positioned(
             bottom: 16.0,

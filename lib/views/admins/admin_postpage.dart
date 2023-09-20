@@ -158,7 +158,7 @@ class _AdminPostPageState extends State<AdminPostPage> {
       });
       UtilSuccess.showSnackBar('Success!');
     } catch (e) {
-      Utils.showSnackBar(e.toString());
+      //  Utils.showSnackBar(e.toString());
     }
   }
 }

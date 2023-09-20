@@ -1,5 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
+
+import '../../utility/utils_success.dart';
+import '../widgets/input_address_widget.dart';
+import '../widgets/input_age_widget.dart';
+import '../widgets/input_widget.dart';
 
 class UserReportPage extends StatefulWidget {
   const UserReportPage({super.key});
@@ -9,6 +16,23 @@ class UserReportPage extends StatefulWidget {
 }
 
 class _UserReportPageState extends State<UserReportPage> {
+  bool _isSubmitting = false;
+  Widget _buildProgressIndicator() {
+    if (_isSubmitting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else {
+      return Container(); // Return an empty container if _isSubmitting is false
+    }
+  }
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _contactnumberController =
+      TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
   bool _headache = false;
   bool _bodymalaise = false;
   bool _myalgia = false;
@@ -86,6 +110,7 @@ class _UserReportPageState extends State<UserReportPage> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      _buildProgressIndicator(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text("Report a case",
@@ -99,22 +124,19 @@ class _UserReportPageState extends State<UserReportPage> {
                             textAlign: TextAlign.center),
                       ),
                       _gap(),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Name',
-                          prefixIcon: Icon(Icons.person),
-                          border: OutlineInputBorder(),
-                        ),
+                      InputWidget(
+                        hintText: "Name",
+                        controller: _nameController,
+                        obscureText: false,
                       ),
                       _gap(),
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                labelText: 'Age',
-                                border: OutlineInputBorder(),
-                              ),
+                            child: InputAgeWidget(
+                              hintText: "Age",
+                              controller: _ageController,
+                              obscureText: false,
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -139,27 +161,17 @@ class _UserReportPageState extends State<UserReportPage> {
                         ],
                       ),
                       _gap(),
-                      IntlPhoneField(
-                        initialCountryCode: 'PH',
-                        decoration: const InputDecoration(
-                          labelText: 'Phone Number',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(),
-                          ),
-                        ),
-                        onChanged: (phone) {},
-                        onCountryChanged: (country) {},
+                      //! CONTACT NUMBER
+                      InputContactNumber(
+                        hintText: "Contact Number (10-digit)",
+                        controller: _contactnumberController,
+                        obscureText: false,
                       ),
                       _gap(),
-                      TextFormField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 4,
-                        decoration: const InputDecoration(
-                          labelText: 'Address',
-                          hintText: 'Enter your address (optional)',
-                          prefixIcon: Icon(Icons.home),
-                          border: OutlineInputBorder(),
-                        ),
+                      InputAddressWidget(
+                        labelText: "Address",
+                        controller: _addressController,
+                        obscureText: false,
                       ),
                       _gap(),
                       Padding(
@@ -394,7 +406,9 @@ class _UserReportPageState extends State<UserReportPage> {
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            uploadDataToFirebase();
+                          },
                         ),
                       ),
                     ],
@@ -406,6 +420,71 @@ class _UserReportPageState extends State<UserReportPage> {
         ),
       ),
     );
+  }
+
+  void uploadDataToFirebase() async {
+    setState(() {
+      _isSubmitting = true; // Begin submission
+    });
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    try {
+      CollectionReference reports =
+          FirebaseFirestore.instance.collection('reports');
+      const CircularProgressIndicator();
+      await reports.add({
+        'name': _nameController.text,
+        'age': _ageController.text,
+        'sex': value,
+        'contact_number': _contactnumberController.text,
+        'address': _addressController.text,
+        'headache': _headache,
+        'body_malaise': _bodymalaise,
+        'myalgia': _myalgia,
+        'arthralgia': _arthralgia,
+        'retroOrbitalPain': _retroOrbitalPain,
+        'anorexia': _anorexia,
+        'nausea': _nausea,
+        'vomiting': _vomiting,
+        'diarrhea': _diarrhea,
+        'flushedSkin': _flushedSkin,
+        'fever': _retroOrbitalPain,
+        'lowPlateLet': _lowPlateLet,
+        'date': DateTime.now().toString(),
+        'emailid': user!.email!,
+        // Add other fields as necessary
+      });
+
+      UtilSuccess.showSnackBar('Success!');
+    } catch (e) {
+      //  Utils.showSnackBar(e.toString());
+    } finally {
+      _isSubmitting = false;
+      resetForm();
+    }
+  }
+
+  void resetForm() {
+    setState(() {
+      _nameController.clear();
+      _ageController.clear();
+      _addressController.clear();
+      _contactnumberController.clear();
+      _addressController.clear();
+      value = 'Male';
+      _headache = false;
+      _bodymalaise = false;
+      _myalgia = false;
+      _arthralgia = false;
+      _retroOrbitalPain = false;
+      _anorexia = false;
+      _nausea = false;
+      _vomiting = false;
+      _diarrhea = false;
+      _flushedSkin = false;
+      _fever = false;
+      _lowPlateLet = false;
+    });
   }
 }
 
