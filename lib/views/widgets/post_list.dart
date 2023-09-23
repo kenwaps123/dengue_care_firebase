@@ -1,10 +1,14 @@
+import 'package:denguecare_firebase/views/admins/admin_viewpost.dart';
 import 'package:denguecare_firebase/views/users/user_viewpost.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+
+import '../../utility/utils.dart';
 
 class PostsList extends StatefulWidget {
   const PostsList({super.key});
@@ -31,6 +35,28 @@ Widget conditionalImage(String imageUrl) {
 }
 
 class _PostsListState extends State<PostsList> {
+  getUserType(Map<String, dynamic> data) {
+    //! getting user type to segregate
+    User? user = FirebaseAuth.instance.currentUser;
+    var kk = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        if (documentSnapshot.get('role') == "Admin") {
+          Get.offAll(() => AdminViewPost(post: data));
+        } else if (documentSnapshot.get('role') == "Superadmin") {
+          Get.offAll(() => AdminViewPost(post: data));
+        } else {
+          Get.offAll(() => UserViewPostPage(post: data));
+        }
+      } else {
+        Utils.showSnackBar('Document does not exist on the database');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -49,7 +75,7 @@ class _PostsListState extends State<PostsList> {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return InkWell(
               onTap: () {
-                Get.offAll(() => UserVIewPostPage(post: data));
+                getUserType(data);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

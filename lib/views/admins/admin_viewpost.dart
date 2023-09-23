@@ -1,13 +1,13 @@
-import 'package:denguecare_firebase/views/users/user_homepage.dart';
+import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../widgets/post_list.dart';
 
-class UserViewPostPage extends StatelessWidget {
+class AdminViewPost extends StatelessWidget {
   final Map<String, dynamic> post;
 
-  const UserViewPostPage({super.key, required this.post});
+  const AdminViewPost({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class UserViewPostPage extends StatelessWidget {
         title: const Text('Post Details'),
         leading: BackButton(
           onPressed: () {
-            Get.offAll(() => const UserMainPage());
+            Get.offAll(() => const AdminMainPage());
           },
         ),
       ),

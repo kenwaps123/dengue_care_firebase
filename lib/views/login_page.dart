@@ -153,6 +153,8 @@ void route() {
     if (documentSnapshot.exists) {
       if (documentSnapshot.get('role') == "Admin") {
         Get.offAll(() => const AdminMainPage());
+      } else if (documentSnapshot.get('role') == "Superadmin") {
+        Get.offAll(() => const AdminMainPage());
       } else {
         Get.offAll(() => const UserMainPage());
       }
