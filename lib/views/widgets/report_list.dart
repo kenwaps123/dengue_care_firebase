@@ -19,7 +19,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         }
 
         return ListView(

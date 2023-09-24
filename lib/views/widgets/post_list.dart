@@ -14,13 +14,17 @@ class PostsList extends StatefulWidget {
   const PostsList({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PostsListState createState() => _PostsListState();
 }
 
 Widget conditionalImage(String imageUrl) {
   if (kIsWeb) {
     // If the platform is web
-    return Image.network(imageUrl);
+    return Image(
+      image: NetworkImage(imageUrl),
+      fit: BoxFit.fill,
+    );
   } else if (Platform.isAndroid) {
     // If the platform is Android
     return CachedNetworkImage(
@@ -38,6 +42,7 @@ class _PostsListState extends State<PostsList> {
   getUserType(Map<String, dynamic> data) {
     //! getting user type to segregate
     User? user = FirebaseAuth.instance.currentUser;
+    // ignore: unused_local_variable
     var kk = FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
