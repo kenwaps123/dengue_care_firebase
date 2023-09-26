@@ -156,7 +156,10 @@ class _AdminPostPageState extends State<AdminPostPage> {
             user!.email, // Assuming the displayName is set for Firebase user.
         'uploaderUID': user.uid,
       });
-      UtilSuccess.showSnackBar('Success!');
+      UtilSuccess.showSuccessSnackBar(
+        text: 'Success!',
+        action: SnackBarAction(label: 'TExt', onPressed: () {}),
+      );
     } catch (e) {
       //  Utils.showSnackBar(e.toString());
     }

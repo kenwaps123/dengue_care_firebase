@@ -4,9 +4,6 @@ import 'package:denguecare_firebase/views/users/user_settings_page.dart';
 import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-import '../login_page.dart';
 
 class UserHomePage extends StatelessWidget {
   const UserHomePage({super.key});
@@ -31,10 +28,7 @@ class UserHomePage extends StatelessWidget {
                     size: 26,
                   ),
                   title: const Text('About'),
-                  onTap: () {
-                    FirebaseAuth.instance.signOut();
-                    Get.offAll(() => const LoginPage());
-                  },
+                  onTap: () {},
                 ),
               ),
             ],

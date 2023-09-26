@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/views/admins/admin_viewreportedcasespage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ReportListWidget extends StatefulWidget {
   const ReportListWidget({super.key});
@@ -22,23 +24,45 @@ class _ReportListWidgetState extends State<ReportListWidget> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return InkWell(
-              onTap: () {},
-              child: SizedBox(
-                width: double.infinity,
-                child: Column(
-                  children: <Widget>[
-                    const SizedBox(height: 8.0),
-                    Text(data['name']),
-                    const SizedBox(height: 8.0),
-                  ],
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> data =
+                snapshot.data!.docs[index].data() as Map<String, dynamic>;
+            return Container(
+              width: 50,
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 3.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0)),
+                child: ListTile(
+                  title:
+                      Text('${'Name : ' + data['name']} | Age: ' + data['age']),
+                  subtitle: Text('Contact Number : ' + data['contact_number']),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Get.offAll(() => AdminViewReportedCasesPage(
+                              reportedCaseData: data));
+                        },
+                        icon: const Icon(Icons.edit_note_rounded),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.check_rounded),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
-          }).toList(),
+          },
+          // children: snapshot.data!.docs.map((DocumentSnapshot document) {
+
+          // }).toList(),
         );
       },
     );

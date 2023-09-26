@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
+import 'package:denguecare_firebase/views/admins/admin_manageadmin.dart';
 import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
 import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -109,7 +110,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   Icons.person_pin_rounded,
                   color: Colors.black,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Get.offAll(() => const ManageAdmin());
+                },
               ),
               ListTile(
                 title: const Text('Prefereneces'),

@@ -1,3 +1,4 @@
+import 'package:denguecare_firebase/views/users/user_accountsettings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -55,7 +56,9 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
               Icons.person,
               color: Colors.black,
             ),
-            onTap: () {},
+            onTap: () {
+              Get.offAll(() => const UserAccountSettingsPage());
+            },
           ),
           ListTile(
             title: const Text('Prefereneces'),

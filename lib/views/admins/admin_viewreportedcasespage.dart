@@ -1,101 +1,38 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:denguecare_firebase/views/admins/admin_reportpage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-import '../../utility/utils_success.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
+import '../widgets/input_contact_number.dart';
 import '../widgets/input_widget.dart';
 
-class UserReportPage extends StatefulWidget {
-  const UserReportPage({super.key});
+class AdminViewReportedCasesPage extends StatefulWidget {
+  final Map<String, dynamic> reportedCaseData;
+  const AdminViewReportedCasesPage({super.key, required this.reportedCaseData});
 
   @override
-  State<UserReportPage> createState() => _UserReportPageState();
+  State<AdminViewReportedCasesPage> createState() =>
+      _AdminViewReportedCasesPageState();
 }
 
-class _UserReportPageState extends State<UserReportPage> {
-  bool _isSubmitting = false;
-  Widget _buildProgressIndicator() {
-    if (_isSubmitting) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    } else {
-      return Container(); // Return an empty container if _isSubmitting is false
-    }
-  }
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _contactnumberController =
-      TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-
-  bool _headache = false;
-  bool _bodymalaise = false;
-  bool _myalgia = false;
-  bool _arthralgia = false;
-  bool _retroOrbitalPain = false;
-  bool _anorexia = false;
-  bool _nausea = false;
-  bool _vomiting = false;
-  bool _diarrhea = false;
-  bool _flushedSkin = false;
-  bool _fever = false;
-  bool _lowPlateLet = false;
+class _AdminViewReportedCasesPageState
+    extends State<AdminViewReportedCasesPage> {
   String? value;
   final sex = ['Male', 'Female'];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Report a case'),
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          PopupMenuButton<int>(
-            padding: EdgeInsets.zero,
-            onSelected: (item) => handleClick(item),
-            itemBuilder: (context) => [
-              PopupMenuItem<int>(
-                value: 0,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.translate,
-                    color: Colors.black,
-                    size: 26,
-                  ),
-                  title: const Text('Language'),
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text("Choose Language"),
-                      content: SingleChildScrollView(
-                        child: ListBody(
-                          children: <Widget>[
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("English"),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("Tagalog"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Post Details'),
+          leading: BackButton(
+            onPressed: () {
+              Get.offAll(() => const AdminReportPage());
+            },
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
+        ),
+        body: SingleChildScrollView(
           child: Form(
             child: Center(
               child: Card(
@@ -110,7 +47,6 @@ class _UserReportPageState extends State<UserReportPage> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildProgressIndicator(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text("Report a case",
@@ -126,8 +62,9 @@ class _UserReportPageState extends State<UserReportPage> {
                       _gap(),
                       InputWidget(
                         hintText: "Name",
-                        controller: _nameController,
                         obscureText: false,
+                        initialVal: widget.reportedCaseData['name'],
+                        enableTextInput: false,
                       ),
                       _gap(),
                       Row(
@@ -135,8 +72,9 @@ class _UserReportPageState extends State<UserReportPage> {
                           Expanded(
                             child: InputAgeWidget(
                               hintText: "Age",
-                              controller: _ageController,
                               obscureText: false,
+                              enableTextInput: false,
+                              initialVal: widget.reportedCaseData['age'],
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -150,10 +88,9 @@ class _UserReportPageState extends State<UserReportPage> {
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   items: sex.map(buildMenuItem).toList(),
-                                  value: value,
+                                  value: widget.reportedCaseData['sex'],
                                   hint: const Text('Sex'),
-                                  onChanged: (value) =>
-                                      setState(() => this.value = value),
+                                  onChanged: null,
                                 ),
                               ),
                             ),
@@ -164,14 +101,16 @@ class _UserReportPageState extends State<UserReportPage> {
                       //! CONTACT NUMBER
                       InputContactNumber(
                         hintText: "Contact Number (10-digit)",
-                        controller: _contactnumberController,
+                        initialVal: widget.reportedCaseData['contact_number'],
+                        enableTextInput: false,
                         obscureText: false,
                       ),
                       _gap(),
                       InputAddressWidget(
                         labelText: "Address",
-                        controller: _addressController,
+                        initialVal: widget.reportedCaseData['address'],
                         obscureText: false,
+                        enableTextInput: false,
                       ),
                       _gap(),
                       Padding(
@@ -185,13 +124,10 @@ class _UserReportPageState extends State<UserReportPage> {
                         children: <Widget>[
                           Expanded(
                             child: CheckboxListTile(
-                              value: _headache,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _headache = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['headache'],
+                              onChanged: (value) {},
                               title: const Text('Headache'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -200,13 +136,10 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                           Expanded(
                             child: CheckboxListTile(
-                              value: _bodymalaise,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _bodymalaise = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['body_malaise'],
+                              onChanged: (value) {},
                               title: const Text('Body Malaise'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -220,13 +153,10 @@ class _UserReportPageState extends State<UserReportPage> {
                         children: <Widget>[
                           Expanded(
                             child: CheckboxListTile(
-                              value: _myalgia,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _myalgia = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['myalgia'],
+                              onChanged: (value) {},
                               title: const Text('Myalgia'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -235,13 +165,10 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                           Expanded(
                             child: CheckboxListTile(
-                              value: _arthralgia,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _arthralgia = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['arthralgia'],
+                              onChanged: (value) {},
                               title: const Text('Arthralgia'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -255,13 +182,11 @@ class _UserReportPageState extends State<UserReportPage> {
                         children: <Widget>[
                           Expanded(
                             child: CheckboxListTile(
-                              value: _retroOrbitalPain,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _retroOrbitalPain = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value:
+                                  widget.reportedCaseData['retroOrbitalPain'],
+                              onChanged: (value) {},
                               title: const Text('Retro Orbital Pain'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -270,13 +195,10 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                           Expanded(
                             child: CheckboxListTile(
-                              value: _anorexia,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _anorexia = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['anorexia'],
+                              onChanged: (value) {},
                               title: const Text('Anorexia'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -290,13 +212,10 @@ class _UserReportPageState extends State<UserReportPage> {
                         children: <Widget>[
                           Expanded(
                             child: CheckboxListTile(
-                              value: _nausea,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _nausea = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['nausea'],
+                              onChanged: (value) {},
                               title: const Text('Nausea'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -305,13 +224,10 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                           Expanded(
                             child: CheckboxListTile(
-                              value: _vomiting,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _vomiting = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['vomiting'],
+                              onChanged: (value) {},
                               title: const Text('Vomiting'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -325,13 +241,10 @@ class _UserReportPageState extends State<UserReportPage> {
                         children: <Widget>[
                           Expanded(
                             child: CheckboxListTile(
-                              value: _diarrhea,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _diarrhea = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['diarrhea'],
+                              onChanged: (value) {},
                               title: const Text('Diarrhea'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -340,13 +253,10 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                           Expanded(
                             child: CheckboxListTile(
-                              value: _flushedSkin,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _flushedSkin = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['flushedSkin'],
+                              onChanged: (value) {},
                               title: const Text('Rashes'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -360,13 +270,10 @@ class _UserReportPageState extends State<UserReportPage> {
                         children: <Widget>[
                           Expanded(
                             child: CheckboxListTile(
-                              value: _fever,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _fever = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['fever'],
+                              onChanged: (value) {},
                               title: const Text('On and Off Fever'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -375,13 +282,10 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                           Expanded(
                             child: CheckboxListTile(
-                              value: _lowPlateLet,
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _lowPlateLet = value;
-                                });
-                              },
+                              tristate: true,
+                              enabled: false,
+                              value: widget.reportedCaseData['lowPlateLet'],
+                              onChanged: (value) {},
                               title: const Text('Low platelet count'),
                               controlAffinity: ListTileControlAffinity.leading,
                               dense: true,
@@ -390,6 +294,7 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                         ],
                       ),
+
                       _gap(),
                       SizedBox(
                         width: double.infinity,
@@ -406,9 +311,7 @@ class _UserReportPageState extends State<UserReportPage> {
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          onPressed: () {
-                            uploadDataToFirebase();
-                          },
+                          onPressed: () {},
                         ),
                       ),
                     ],
@@ -421,74 +324,6 @@ class _UserReportPageState extends State<UserReportPage> {
       ),
     );
   }
-
-  void uploadDataToFirebase() async {
-    setState(() {
-      _isSubmitting = true; // Begin submission
-    });
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final user = auth.currentUser;
-    try {
-      CollectionReference reports =
-          FirebaseFirestore.instance.collection('reports');
-      const CircularProgressIndicator();
-      await reports.add({
-        'name': _nameController.text,
-        'age': _ageController.text,
-        'sex': value,
-        'contact_number': _contactnumberController.text,
-        'address': _addressController.text,
-        'headache': _headache,
-        'body_malaise': _bodymalaise,
-        'myalgia': _myalgia,
-        'arthralgia': _arthralgia,
-        'retroOrbitalPain': _retroOrbitalPain,
-        'anorexia': _anorexia,
-        'nausea': _nausea,
-        'vomiting': _vomiting,
-        'diarrhea': _diarrhea,
-        'flushedSkin': _flushedSkin,
-        'fever': _retroOrbitalPain,
-        'lowPlateLet': _lowPlateLet,
-        'date': DateTime.now().toString(),
-        'emailid': user!.email!,
-        // Add other fields as necessary
-      });
-
-      UtilSuccess.showSuccessSnackBar(
-        text: 'Success!',
-        action: SnackBarAction(label: 'text', onPressed: () {}),
-      );
-    } catch (e) {
-      //  Utils.showSnackBar(e.toString());
-    } finally {
-      _isSubmitting = false;
-      resetForm();
-    }
-  }
-
-  void resetForm() {
-    setState(() {
-      _nameController.clear();
-      _ageController.clear();
-      _addressController.clear();
-      _contactnumberController.clear();
-      _addressController.clear();
-      value = 'Male';
-      _headache = false;
-      _bodymalaise = false;
-      _myalgia = false;
-      _arthralgia = false;
-      _retroOrbitalPain = false;
-      _anorexia = false;
-      _nausea = false;
-      _vomiting = false;
-      _diarrhea = false;
-      _flushedSkin = false;
-      _fever = false;
-      _lowPlateLet = false;
-    });
-  }
 }
 
 Widget _gap() => const SizedBox(height: 16);
@@ -496,14 +331,3 @@ DropdownMenuItem<String> buildMenuItem(String sex) => DropdownMenuItem(
       value: sex,
       child: Text(sex),
     );
-
-void handleClick(int item) {
-  switch (item) {
-    case 0:
-      break;
-    case 1:
-      break;
-    case 2:
-      break;
-  }
-}

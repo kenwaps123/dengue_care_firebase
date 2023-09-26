@@ -3,15 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InputAddressWidget extends StatelessWidget {
-  const InputAddressWidget(
-      {super.key,
-      required this.labelText,
-      required this.controller,
-      required this.obscureText});
+  const InputAddressWidget({
+    super.key,
+    required this.labelText,
+    this.controller,
+    required this.obscureText,
+    this.initialVal,
+    this.enableTextInput,
+  });
 
   final String labelText;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final bool obscureText;
+  final String? initialVal;
+  final bool? enableTextInput;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,9 @@ class InputAddressWidget extends StatelessWidget {
         keyboardType: TextInputType.multiline,
         maxLines: 4,
         obscureText: obscureText,
+        initialValue: initialVal,
         controller: controller,
+        enabled: enableTextInput,
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: labelText,

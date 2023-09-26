@@ -11,25 +11,27 @@ class UserViewPostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Post Details'),
-        leading: BackButton(
-          onPressed: () {
-            Get.offAll(() => const UserMainPage());
-          },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Post Details'),
+          leading: BackButton(
+            onPressed: () {
+              Get.offAll(() => const UserMainPage());
+            },
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            conditionalImage(post['imageUrl']),
-            const SizedBox(height: 8.0),
-            Text(post['caption']),
-            const SizedBox(height: 8.0),
-            Text(post['postDetails']),
-            // ... Add other details as needed
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              conditionalImage(post['imageUrl']),
+              const SizedBox(height: 8.0),
+              Text(post['caption']),
+              const SizedBox(height: 8.0),
+              Text(post['postDetails']),
+              // ... Add other details as needed
+            ],
+          ),
         ),
       ),
     );

@@ -16,26 +16,28 @@ class AdminDataVizPage extends StatefulWidget {
 class _AdminDataVizPageState extends State<AdminDataVizPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blueAccent,
-      body: const Text("Test"),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'Pickerfile',
-        onPressed: () async {
-          PermissionStatus status = await Permission.storage.request();
-          if (status == PermissionStatus.granted) {
-            _pickAndUploadFile();
-          }
-          if (status == PermissionStatus.denied) {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text("this persdkfsf")));
-          }
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.blueAccent,
+        body: const Text("Test"),
+        floatingActionButton: FloatingActionButton(
+          heroTag: 'Pickerfile',
+          onPressed: () async {
+            PermissionStatus status = await Permission.storage.request();
+            if (status == PermissionStatus.granted) {
+              _pickAndUploadFile();
+            }
+            if (status == PermissionStatus.denied) {
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("this persdkfsf")));
+            }
 
-          print(status.toString());
-        },
-        tooltip: 'Pick A File',
-        child: const Icon(Icons.add),
+            print(status.toString());
+          },
+          tooltip: 'Pick A File',
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

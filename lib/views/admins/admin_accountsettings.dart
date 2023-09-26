@@ -46,15 +46,14 @@ class _AdminEditState extends State<AdminEdit> {
   final FirebaseAuth aw = FirebaseAuth.instance;
   final TextEditingController _newnameController = TextEditingController();
   final TextEditingController _newageController = TextEditingController();
-  final TextEditingController _newsexController = TextEditingController();
+
   final TextEditingController _newemailController = TextEditingController();
-  String? _message = '';
 
   @override
   void dispose() {
     _newnameController.dispose();
     _newageController.dispose();
-    _newsexController.dispose();
+
     _newemailController.dispose();
     super.dispose();
   }
@@ -75,7 +74,7 @@ class _AdminEditState extends State<AdminEdit> {
             snapshot.data!.data() as Map<String, dynamic>;
         _newnameController.text = userData['name'] ?? '';
         _newageController.text = userData['age'] ?? '';
-        _newsexController.text = userData['sex'] ?? '';
+
         _newemailController.text = userData['email'] ?? '';
         return SingleChildScrollView(
           child: Center(
@@ -93,7 +92,7 @@ class _AdminEditState extends State<AdminEdit> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('images/logo-no-background.png'),
+                      Image.asset('assets/images/logo-no-background.png'),
                       const SizedBox(height: 20),
                       const SizedBox(height: 20),
                       Text(
@@ -110,12 +109,6 @@ class _AdminEditState extends State<AdminEdit> {
                       InputAgeWidget(
                         hintText: "Update Age",
                         controller: _newageController,
-                        obscureText: false,
-                      ),
-                      const SizedBox(height: 20),
-                      InputWidget(
-                        hintText: "Update Sex",
-                        controller: _newsexController,
                         obscureText: false,
                       ),
                       const SizedBox(height: 20),
@@ -136,7 +129,7 @@ class _AdminEditState extends State<AdminEdit> {
                             ),
                           ),
                           onPressed: () async {
-                            _updateUserInfo;
+                            _updateUserInfo(context);
                           },
                           child: Text(
                             'Update',
@@ -146,7 +139,6 @@ class _AdminEditState extends State<AdminEdit> {
                           ),
                         ),
                       ),
-                      Text(_message ?? ''),
                     ],
                   ),
                 ),
@@ -158,13 +150,12 @@ class _AdminEditState extends State<AdminEdit> {
     );
   }
 
-  Future<void> _updateUserInfoinFirestore(String uid, String newName,
-      String newAge, String newSex, String newEmail) async {
+  Future<void> _updateUserInfoinFirestore(
+      String uid, String newName, String newAge, String newEmail) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(uid).update({
         'name': newName,
         'age': newAge,
-        'sex': newSex,
         'email': newEmail,
       });
     } catch (error) {
@@ -172,25 +163,44 @@ class _AdminEditState extends State<AdminEdit> {
     }
   }
 
-  Future<void> _updateUserInfo() async {
+  Future<void> _updateUserInfo(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
     String newName = _newnameController.text;
     String newAge = _newageController.text;
-    String newSex = _newsexController.text;
+    String message;
     String newEmail = _newemailController.text;
     try {
       await user!.updateDisplayName(newName);
       await user.updateEmail(newEmail);
       await _updateUserInfoinFirestore(
-          user.uid, newName, newAge, newSex, newEmail);
+        user.uid,
+        newName,
+        newAge,
+        newEmail,
+      );
       await user.reload();
-      setState(() {
-        _message = 'User Information updated successfully';
-      });
-    } catch (error) {
-      setState(() {
-        _message = 'Error updating user info';
-      });
+
+      message = 'User Information updated successfully';
+      // ignore: use_build_context_synchronously
+      _showSnackbarSuccess(context, message);
+    } catch (e) {
+      _showSnackbarError(context, e.toString());
     }
+  }
+
+  void _showSnackbarSuccess(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void _showSnackbarError(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 }

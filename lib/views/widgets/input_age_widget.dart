@@ -6,12 +6,16 @@ class InputAgeWidget extends StatelessWidget {
   const InputAgeWidget(
       {super.key,
       required this.hintText,
-      required this.controller,
-      required this.obscureText});
+      this.controller,
+      required this.obscureText,
+      this.initialVal,
+      this.enableTextInput});
 
   final String hintText;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final bool obscureText;
+  final String? initialVal;
+  final bool? enableTextInput;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +27,8 @@ class InputAgeWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
+        enabled: enableTextInput,
+        initialValue: initialVal,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'This field is required';

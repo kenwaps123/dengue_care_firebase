@@ -262,7 +262,10 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               _sexController.text.trim(),
                               _contactNumberController.text.trim(),
                               userType);
-                          UtilSuccess.showSnackBar("Success");
+                          UtilSuccess.showSuccessSnackBar(
+                              text: "Success",
+                              action: SnackBarAction(
+                                  label: 'Text', onPressed: () {}));
                           // Handle user registration completion
                         } on FirebaseAuthException catch (e) {
                           Utils.showSnackBar(e.message);

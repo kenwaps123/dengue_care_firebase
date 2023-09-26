@@ -21,15 +21,22 @@ class AdminViewPost extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            conditionalImage(post['imageUrl']),
-            const SizedBox(height: 8.0),
-            Text(post['caption']),
-            const SizedBox(height: 8.0),
-            Text(post['postDetails']),
-            // ... Add other details as needed
-          ],
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 8.0),
+              SizedBox(
+                width: 500,
+                height: 450,
+                child: conditionalImage(post['imageUrl']),
+              ),
+              const SizedBox(height: 8.0),
+              Text(post['caption']),
+              const SizedBox(height: 8.0),
+              Text(post['postDetails']),
+              // ... Add other details as needed
+            ],
+          ),
         ),
       ),
     );

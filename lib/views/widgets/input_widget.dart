@@ -3,15 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InputWidget extends StatelessWidget {
-  const InputWidget(
-      {super.key,
-      required this.hintText,
-      required this.controller,
-      required this.obscureText});
+  const InputWidget({
+    super.key,
+    required this.hintText,
+    this.controller,
+    required this.obscureText,
+    this.initialVal,
+    this.enableTextInput,
+  });
 
   final String hintText;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final bool obscureText;
+  final String? initialVal;
+  final bool? enableTextInput;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +36,8 @@ class InputWidget extends StatelessWidget {
         },
         obscureText: obscureText,
         controller: controller,
+        enabled: enableTextInput,
+        initialValue: initialVal,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,

@@ -24,6 +24,7 @@ Widget conditionalImage(String imageUrl) {
     return Image(
       image: NetworkImage(imageUrl),
       fit: BoxFit.fill,
+      width: double.maxFinite,
     );
   } else if (Platform.isAndroid) {
     // If the platform is Android
@@ -64,6 +65,8 @@ class _PostsListState extends State<PostsList> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    var isLargeScreen = screenSize.width > 1600;
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('posts').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -83,7 +86,9 @@ class _PostsListState extends State<PostsList> {
                 getUserType(data);
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                margin: isLargeScreen
+                    ? const EdgeInsets.symmetric(horizontal: 250, vertical: 20)
+                    : const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.white,
@@ -99,7 +104,9 @@ class _PostsListState extends State<PostsList> {
                 width: double.infinity,
                 child: Column(
                   children: <Widget>[
-                    conditionalImage(data['imageUrl']),
+                    AspectRatio(
+                        aspectRatio: isLargeScreen ? 3 / 2 : 16 / 9,
+                        child: conditionalImage(data['imageUrl'])),
                     const SizedBox(height: 8.0),
                     Text(data['caption']),
                     const SizedBox(height: 8.0),
