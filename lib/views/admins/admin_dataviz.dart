@@ -31,6 +31,7 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
               // ignore: use_build_context_synchronously
               ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("this persdkfsf")));
+              print(status.toString());
             }
 
             print(status.toString());
@@ -41,19 +42,6 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
       ),
     );
   }
-
-  // void requestStoragePermission() async {
-  //   PermissionStatus status = await Permission.storage.request();
-
-  //   if (status.isGranted) {
-  //     _pickAndUploadFile();
-  //     // You can now use the storage
-  //   } else if (status.isPermanentlyDenied) {
-  //     // The user chose to never ask again. You can instruct them to manually enable it from the settings.
-  //   } else {
-  //     // The permission was denied (possibly temporary)
-  //   }
-  // }
 
   Future _pickAndUploadFile() async {
     final CollectionReference addDLL =

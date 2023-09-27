@@ -24,7 +24,12 @@ class _AdminReportPageState extends State<AdminReportPage> {
             },
           ),
         ),
-        body: const ReportListWidget(),
+        body: const Center(
+          child: SizedBox(
+            width: 600,
+            child: ReportListWidget(),
+          ),
+        ),
       ),
     );
   }

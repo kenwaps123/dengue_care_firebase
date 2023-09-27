@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InputPasswordWidget extends StatelessWidget {
-  const InputPasswordWidget(
-      {super.key,
-      required this.hintText,
-      required this.controller,
-      required this.obscureText,
-      required this.iconButton});
+  const InputPasswordWidget({
+    super.key,
+    required this.hintText,
+    required this.controller,
+    required this.obscureText,
+    required this.iconButton,
+    this.labelText,
+  });
 
   final String hintText;
   final TextEditingController controller;
   final bool obscureText;
   final IconButton iconButton;
+  final String? labelText;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,6 +40,7 @@ class InputPasswordWidget extends StatelessWidget {
         decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
+            labelText: labelText,
             hintStyle: GoogleFonts.poppins(),
             // contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             suffixIcon: iconButton),

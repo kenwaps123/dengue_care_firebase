@@ -25,7 +25,7 @@ class _AdminViewReportedCasesPageState
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Post Details'),
+          title: const Text('Case Details'),
           leading: BackButton(
             onPressed: () {
               Get.offAll(() => const AdminReportPage());
@@ -49,17 +49,11 @@ class _AdminViewReportedCasesPageState
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text("Report a case",
+                        child: Text("Reported Case",
                             style: Theme.of(context).textTheme.headlineSmall),
                       ),
                       _gap(),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text("Please enter the following details.",
-                            style: Theme.of(context).textTheme.bodySmall,
-                            textAlign: TextAlign.center),
-                      ),
-                      _gap(),
+
                       InputWidget(
                         hintText: "Name",
                         obscureText: false,

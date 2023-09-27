@@ -450,7 +450,7 @@ class _UserReportPageState extends State<UserReportPage> {
         'flushedSkin': _flushedSkin,
         'fever': _retroOrbitalPain,
         'lowPlateLet': _lowPlateLet,
-        'date': DateTime.now().toString(),
+        'date': FieldValue.serverTimestamp(),
         'emailid': user!.email!,
         // Add other fields as necessary
       });

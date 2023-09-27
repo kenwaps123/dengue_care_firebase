@@ -10,6 +10,7 @@ class InputContactNumber extends StatelessWidget {
     required this.obscureText,
     this.initialVal,
     this.enableTextInput,
+    this.labelText,
   });
 
   final String hintText;
@@ -17,6 +18,7 @@ class InputContactNumber extends StatelessWidget {
   final bool obscureText;
   final String? initialVal;
   final bool? enableTextInput;
+  final String? labelText;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,7 @@ class InputContactNumber extends StatelessWidget {
         enabled: enableTextInput,
         decoration: InputDecoration(
           border: InputBorder.none,
+          labelText: labelText,
           hintText: hintText,
           hintStyle: GoogleFonts.poppins(fontSize: 14),
         ), // contentPadding: const EdgeInsets.symmetric(horizontal: 20)),

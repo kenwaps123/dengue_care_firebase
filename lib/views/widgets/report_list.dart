@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_viewreportedcasespage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class ReportListWidget extends StatefulWidget {
   const ReportListWidget({super.key});
@@ -14,7 +15,10 @@ class _ReportListWidgetState extends State<ReportListWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('reports').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('reports')
+          .orderBy('date', descending: true)
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -29,6 +33,11 @@ class _ReportListWidgetState extends State<ReportListWidget> {
           itemBuilder: (context, index) {
             Map<String, dynamic> data =
                 snapshot.data!.docs[index].data() as Map<String, dynamic>;
+            // Convert the Timestamp to DateTime
+            DateTime dateTime = (data['date'] as Timestamp).toDate();
+
+            // Format the DateTime to display only the date
+            String formattedDate = DateFormat('MMMMd').format(dateTime);
             return Container(
               width: 50,
               padding: const EdgeInsets.all(8.0),
@@ -43,6 +52,10 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      Text(formattedDate),
+                      const SizedBox(
+                        width: 24,
+                      ),
                       IconButton(
                         onPressed: () {
                           Get.offAll(() => AdminViewReportedCasesPage(

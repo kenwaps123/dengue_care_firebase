@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class InputEmailWidget extends StatelessWidget {
-  const InputEmailWidget(
-      {super.key,
-      required this.hintText,
-      required this.controller,
-      required this.obscureText});
+  const InputEmailWidget({
+    super.key,
+    required this.hintText,
+    required this.controller,
+    required this.obscureText,
+    this.labelText,
+  });
 
   final String hintText;
   final TextEditingController controller;
   final bool obscureText;
-
+  final String? labelText;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,6 +44,7 @@ class InputEmailWidget extends StatelessWidget {
         controller: controller,
         decoration: InputDecoration(
           border: InputBorder.none,
+          labelText: labelText,
           hintText: hintText,
           hintStyle: GoogleFonts.poppins(),
         ), // contentPadding: const EdgeInsets.symmetric(horizontal: 20)),

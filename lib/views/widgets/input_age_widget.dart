@@ -6,6 +6,7 @@ class InputAgeWidget extends StatelessWidget {
   const InputAgeWidget(
       {super.key,
       required this.hintText,
+      this.labelText,
       this.controller,
       required this.obscureText,
       this.initialVal,
@@ -15,6 +16,7 @@ class InputAgeWidget extends StatelessWidget {
   final TextEditingController? controller;
   final bool obscureText;
   final String? initialVal;
+  final String? labelText;
   final bool? enableTextInput;
 
   @override
@@ -44,6 +46,7 @@ class InputAgeWidget extends StatelessWidget {
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
+          labelText: labelText,
           hintStyle: GoogleFonts.poppins(),
         ), // contentPadding: const EdgeInsets.symmetric(horizontal: 20)),
       ),

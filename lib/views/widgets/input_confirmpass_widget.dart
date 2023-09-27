@@ -9,6 +9,7 @@ class InputConfirmPassWidget extends StatefulWidget {
     required this.confirmController,
     required this.obscureText,
     required this.iconButton,
+    this.labelText,
   }) : super(key: key);
 
   final String hintText;
@@ -16,6 +17,7 @@ class InputConfirmPassWidget extends StatefulWidget {
   final TextEditingController confirmController;
   final bool obscureText;
   final IconButton iconButton;
+  final String? labelText;
 
   @override
   _InputConfirmPassWidgetState createState() => _InputConfirmPassWidgetState();
@@ -48,6 +50,7 @@ class _InputConfirmPassWidgetState extends State<InputConfirmPassWidget> {
             onChanged: (_) =>
                 _validatePassword(), // Check password match on change
             decoration: InputDecoration(
+              labelText: widget.labelText,
               border: InputBorder.none,
               hintText: widget.hintText,
               hintStyle: GoogleFonts.poppins(),
@@ -70,6 +73,7 @@ class _InputConfirmPassWidgetState extends State<InputConfirmPassWidget> {
                 _validatePassword(), // Check password match on change
             decoration: InputDecoration(
               border: InputBorder.none,
+              labelText: widget.labelText,
               hintText: 'Confirm ${widget.hintText.toLowerCase()}',
               hintStyle: GoogleFonts.poppins(),
               suffixIcon: _passwordsMatch // Display checkmark or error icon

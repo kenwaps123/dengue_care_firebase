@@ -10,6 +10,7 @@ class InputWidget extends StatelessWidget {
     required this.obscureText,
     this.initialVal,
     this.enableTextInput,
+    this.labelText,
   });
 
   final String hintText;
@@ -17,6 +18,7 @@ class InputWidget extends StatelessWidget {
   final bool obscureText;
   final String? initialVal;
   final bool? enableTextInput;
+  final String? labelText;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class InputWidget extends StatelessWidget {
         initialValue: initialVal,
         decoration: InputDecoration(
           border: InputBorder.none,
+          labelText: labelText,
           hintText: hintText,
           hintStyle: GoogleFonts.poppins(),
         ), // contentPadding: const EdgeInsets.symmetric(horizontal: 20)),
