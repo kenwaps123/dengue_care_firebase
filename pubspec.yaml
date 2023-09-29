@@ -55,6 +55,7 @@ dependencies:
   collection: ^1.15.0
   cached_network_image: ^3.2.3
   intl: ^0.17.0
+  flutter_map: ^5.0.0
 
 dev_dependencies:
   flutter_test:

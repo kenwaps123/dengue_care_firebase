@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
+import 'package:denguecare_firebase/views/admins/admin_announcements.dart';
 import 'package:denguecare_firebase/views/admins/admin_manageadmin.dart';
+import 'package:denguecare_firebase/views/admins/admin_openstreetmap.dart';
 import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
 import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,10 +11,8 @@ import 'dart:math' as math;
 
 import 'package:get/get.dart';
 
-import '../../utility/utils.dart';
 import '../login_page.dart';
 import 'admin_dataviz.dart';
-import 'admin_dengueheatmap.dart';
 import 'admin_reportpage.dart';
 
 showLogoutConfirmationDialog(BuildContext context) async {
@@ -158,7 +157,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             ),
             ActionButton(
               onPressed: () {
-                listenToPosts();
+                Get.offAll(() => const AdminAnnouncementPage());
               },
               icon: const Icon(Icons.announcement),
             ),
@@ -174,18 +173,18 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 
-  void listenToPosts() {
-    FirebaseFirestore.instance.collection('posts').snapshots().listen(
-        (snapshot) {
-      List<DocumentSnapshot> documents = snapshot.docs;
-      for (DocumentSnapshot doc in documents) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        print(data);
-      }
-    }, onError: (e) {
-      Utils.showSnackBar(e.toString());
-    });
-  }
+  // void listenToPosts() {
+  //   FirebaseFirestore.instance.collection('posts').snapshots().listen(
+  //       (snapshot) {
+  //     List<DocumentSnapshot> documents = snapshot.docs;
+  //     for (DocumentSnapshot doc in documents) {
+  //       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  //       print(data);
+  //     }
+  //   }, onError: (e) {
+  //     Utils.showSnackBar(e.toString());
+  //   });
+  // }
 }
 
 const _navBarItemsAdmin = [
@@ -465,7 +464,7 @@ class _AdminMainPageState extends State<AdminMainPage> {
   final screens = [
     const AdminHomePage(),
     const AdminReportPage(),
-    const AdminDengueHeatMapPage(),
+    const AdminOpenStreetMap(),
     const AdminDataVizPage(),
   ];
   Widget _getCurrentScreen() {
@@ -475,7 +474,7 @@ class _AdminMainPageState extends State<AdminMainPage> {
       case 1:
         return const AdminReportPage();
       case 2:
-        return const AdminDengueHeatMapPage();
+        return const AdminOpenStreetMap();
       case 3:
         return const AdminDataVizPage();
       default:
