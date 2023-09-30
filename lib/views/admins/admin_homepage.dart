@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
 import 'package:denguecare_firebase/views/admins/admin_announcements.dart';
 import 'package:denguecare_firebase/views/admins/admin_manageadmin.dart';
@@ -11,6 +12,7 @@ import 'dart:math' as math;
 
 import 'package:get/get.dart';
 
+import '../../utility/utils.dart';
 import '../login_page.dart';
 import 'admin_dataviz.dart';
 import 'admin_reportpage.dart';
@@ -50,6 +52,38 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
+  String? role;
+
+  Future<String?> getUserRole() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // Handle user not logged in scenario, if needed
+      return null;
+    }
+
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (documentSnapshot.exists) {
+      return documentSnapshot.get('role')
+          as String?; // Cast to String, but ensure the 'role' field always contains a string or null
+    } else {
+      Utils.showSnackBar('Document does not exist on the database');
+      return null;
+    }
+  }
+
+  void checkUserRole() async {
+    role = await getUserRole();
+    if (role != null) {
+      print("User Role: $role");
+
+      // Do whatever you want with the role
+    }
+  }
+
   int currentIndex = 0;
 
   static const _actionTitles = [
@@ -75,6 +109,15 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 
+  String? uType;
+  @override
+  void initState() {
+    super.initState();
+    checkUserRole();
+    uType = role;
+    // Calling the Future function when the page loads.
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -84,13 +127,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
+              DrawerHeader(
+                decoration: const BoxDecoration(
                   color: Colors.green,
                 ),
                 child: Text(
-                  'Welcome Admin!',
-                  style: TextStyle(fontSize: 24, color: Colors.white),
+                  role == 'admin' ? 'Welcome Admin!' : 'Welcome Superadmin',
+                  style: const TextStyle(fontSize: 24, color: Colors.white),
                 ),
               ),
               ListTile(
@@ -103,15 +146,18 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   Get.offAll(() => const AdminAccountSettings());
                 },
               ),
-              ListTile(
-                title: const Text('Manage Admins'),
-                leading: const Icon(
-                  Icons.person_pin_rounded,
-                  color: Colors.black,
+              Visibility(
+                visible: role == 'superadmin',
+                child: ListTile(
+                  title: const Text('Manage Admins'),
+                  leading: const Icon(
+                    Icons.person_pin_rounded,
+                    color: Colors.black,
+                  ),
+                  onTap: () {
+                    Get.offAll(() => const ManageAdmin());
+                  },
                 ),
-                onTap: () {
-                  Get.offAll(() => const ManageAdmin());
-                },
               ),
               ListTile(
                 title: const Text('Prefereneces'),

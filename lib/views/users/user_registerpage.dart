@@ -72,7 +72,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('images/logo-no-background.png'),
+                        Image.asset('assets/images/logo-no-background.png'),
                         const SizedBox(height: 20),
                         const SizedBox(height: 20),
                         Text(
@@ -180,12 +180,20 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return _cardOTPDialog();
+        return _cardOTPDialog(context);
       },
     );
   }
 
-  Widget _cardOTPDialog() {
+  Widget _cardOTPDialog(BuildContext context) {
+    void _showSnackbarSuccess(BuildContext context, String message) {
+      final snackbar = SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+
     return AlertDialog(
       title: Text(
         'Verify your phone number',
@@ -253,6 +261,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                             verificationId: _verificationId.value,
                             smsCode: _otpCode,
                           );
+
                           await _auth.signInWithCredential(credential);
                           signUp(
                               _emailController.text.trim(),
@@ -262,10 +271,12 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               _sexController.text.trim(),
                               _contactNumberController.text.trim(),
                               userType);
+
                           UtilSuccess.showSuccessSnackBar(
                               text: "Success",
                               action: SnackBarAction(
                                   label: 'Text', onPressed: () {}));
+
                           // Handle user registration completion
                         } on FirebaseAuthException catch (e) {
                           Utils.showSnackBar(e.message);

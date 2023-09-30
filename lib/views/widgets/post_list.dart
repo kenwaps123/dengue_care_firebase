@@ -52,7 +52,7 @@ class _PostsListState extends State<PostsList> {
       if (documentSnapshot.exists) {
         if (documentSnapshot.get('role') == "Admin") {
           Get.offAll(() => AdminViewPost(post: data));
-        } else if (documentSnapshot.get('role') == "Superadmin") {
+        } else if (documentSnapshot.get('role') == "superadmin") {
           Get.offAll(() => AdminViewPost(post: data));
         } else {
           Get.offAll(() => UserViewPostPage(post: data));
