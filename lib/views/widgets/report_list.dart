@@ -46,9 +46,8 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
                 child: ListTile(
-                  title:
-                      Text('${'Name : ' + data['name']} | Age: ' + data['age']),
-                  subtitle: Text('Contact Number : ' + data['contact_number']),
+                  title: Text('${'' + data['name']} | Age: ' + data['age']),
+                  subtitle: Text(data['contact_number']),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

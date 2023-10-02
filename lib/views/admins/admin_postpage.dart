@@ -142,19 +142,25 @@ class _AdminPostPageState extends State<AdminPostPage> {
     final user = auth.currentUser;
 
     try {
-      String imageName = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      Reference ref = FirebaseStorage.instance.ref().child('images/$imageName');
-      UploadTask uploadTask = ref.putFile(image!);
-      TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
-      imageUrl = await snapshot.ref.getDownloadURL();
+      String? imageUrl;
+
+      if (image != null) {
+        String imageName = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        Reference ref =
+            FirebaseStorage.instance.ref().child('images/$imageName');
+        UploadTask uploadTask = ref.putFile(image!);
+        TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
+        imageUrl = await snapshot.ref.getDownloadURL();
+      }
 
       FirebaseFirestore.instance.collection('posts').add({
-        'imageUrl': imageUrl,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'caption': _titleController.text.trim(),
         'postDetails': _contentController.text.trim(),
         'uploaderEmail':
             user!.email, // Assuming the displayName is set for Firebase user.
         'uploaderUID': user.uid,
+        'date': FieldValue.serverTimestamp(),
       });
       UtilSuccess.showSuccessSnackBar(
         text: 'Success!',

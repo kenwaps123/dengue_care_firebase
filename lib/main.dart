@@ -90,6 +90,8 @@ class RouterWidget extends StatelessWidget {
           switch (role) {
             case 'Admin':
               return const AdminMainPage();
+            case 'superadmin':
+              return const AdminMainPage();
             case 'User':
               return const UserMainPage();
             default:

@@ -7,6 +7,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../../utility/utils.dart';
 
@@ -18,7 +20,12 @@ class PostsList extends StatefulWidget {
   _PostsListState createState() => _PostsListState();
 }
 
-Widget conditionalImage(String imageUrl) {
+Widget conditionalImage(String? imageUrl) {
+  if (imageUrl == null || imageUrl.isEmpty) {
+    // Show a placeholder or any other widget when there's no image
+    return const Icon(Icons.image_not_supported,
+        size: 50.0); // Example placeholder
+  }
   if (kIsWeb) {
     // If the platform is web
     return Image(
@@ -68,7 +75,10 @@ class _PostsListState extends State<PostsList> {
     var screenSize = MediaQuery.of(context).size;
     var isLargeScreen = screenSize.width > 1600;
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy('date', descending: true)
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -81,6 +91,17 @@ class _PostsListState extends State<PostsList> {
         return ListView(
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+            if (data['date'] == null) {
+              // Handle the case where 'date' is null, maybe return an empty Container or another placeholder
+              return Container();
+            }
+            // Convert the Timestamp to DateTime
+            DateTime dateTime = (data['date'] as Timestamp).toDate();
+
+            // Format the DateTime to display only the date
+            String formattedDate = DateFormat('MMMMd').format(dateTime);
+
             return InkWell(
               onTap: () {
                 getUserType(data);
@@ -104,11 +125,29 @@ class _PostsListState extends State<PostsList> {
                 width: double.infinity,
                 child: Column(
                   children: <Widget>[
+                    // ignore: avoid_unnecessary_containers
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              data['caption'],
+                              style: GoogleFonts.poppins(fontSize: 14),
+                            ),
+                            Text(
+                              formattedDate,
+                              style: GoogleFonts.poppins(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
                     AspectRatio(
                         aspectRatio: isLargeScreen ? 3 / 2 : 16 / 9,
                         child: conditionalImage(data['imageUrl'])),
-                    const SizedBox(height: 8.0),
-                    Text(data['caption']),
                     const SizedBox(height: 8.0),
                   ],
                 ),
