@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/main.dart';
 import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,7 +17,7 @@ class SemaphoreAPI {
   }
 
   Future<void> _loadEnvironmentVariables() async {
-    await dotenv.load(fileName: 'api.env');
+    await dotenv.load(fileName: '.env');
     apikey = dotenv.env['apikey'] ?? '';
   }
 
@@ -48,7 +49,7 @@ class AdminAnnouncementPage extends StatefulWidget {
 }
 
 class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
-  final apikey = dotenv.env['apikey'] ?? '';
+  final apikey = customDotenv.env['apikey'] ?? '';
   final SemaphoreAPI semaphoreAPI = SemaphoreAPI();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController announcementController = TextEditingController();
@@ -134,9 +135,9 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                                 [phoneController.text],
                               );
                               if (success) {
-                                _showSnackbarSuccess(context, "success");
+                                print('success');
                               } else {
-                                _showSnackbarError(context, "fail");
+                                print('fail');
                               }
                             },
                             child: Text(
