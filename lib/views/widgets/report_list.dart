@@ -62,16 +62,16 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      const StatusIcon(color: Colors.red),
                       // Text(
                       //   'Status',
                       //   style: GoogleFonts.poppins(fontSize: 14),
                       //   overflow: TextOverflow.ellipsis,
                       //   maxLines: 1,
                       // ),
-                      // const SizedBox(
-                      //   width: 8,
-                      // ),
-
+                      const SizedBox(
+                        width: 8,
+                      ),
                       Text(
                         formattedDate,
                         style: GoogleFonts.poppins(fontSize: 14),
