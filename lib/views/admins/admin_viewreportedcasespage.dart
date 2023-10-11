@@ -20,6 +20,28 @@ class _AdminViewReportedCasesPageState
     extends State<AdminViewReportedCasesPage> {
   String? value;
   final sex = ['Male', 'Female'];
+  String? valueStatus;
+  final status = ['Suspected', 'Probable', 'Confirmed'];
+  String? valueAdmitted;
+  final admitted = ["Yes", "No"];
+  String? valueRecovered;
+  final recovered = ["Yes", "No"];
+
+  DateTime selectedDateofSymptoms = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDateofSymptoms,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDateofSymptoms) {
+      setState(() {
+        selectedDateofSymptoms = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -290,6 +312,144 @@ class _AdminViewReportedCasesPageState
                       ),
 
                       _gap(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Text("Status : "),
+                          const SizedBox(width: 20),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8.0)),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                items: status.map(buildMenuItemStatus).toList(),
+                                value: valueStatus,
+                                hint: const Text(' '),
+                                onChanged: (value) =>
+                                    setState(() => valueStatus = value),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      _gap(),
+                      Container(
+                        margin: const EdgeInsets.all(3.0),
+                        padding: const EdgeInsets.all(3.0),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Text("Date of first symptom:"),
+                                const SizedBox(width: 16),
+                                Text("${selectedDateofSymptoms.toLocal()}"
+                                    .split(' ')[0]),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () => _selectDate(context),
+                                  child: const Text('Select date'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      _gap(),
+                      Container(
+                        margin: const EdgeInsets.all(3.0),
+                        padding: const EdgeInsets.all(3.0),
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Text("Patient Admitted? : "),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      items: admitted
+                                          .map(buildMenuItemAdmitted)
+                                          .toList(),
+                                      value: valueAdmitted,
+                                      hint: const Text(' '),
+                                      onChanged: (value) =>
+                                          setState(() => valueAdmitted = value),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [Text("If YES :")],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    enabled: true,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Hospital name',
+                                      prefixIcon:
+                                          Icon(Icons.local_hospital_rounded),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      _gap(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Text("Patient Recovered? : "),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8.0)),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                items: recovered
+                                    .map(buildMenuItemRecovered)
+                                    .toList(),
+                                value: valueRecovered,
+                                hint: const Text(' '),
+                                onChanged: (value) =>
+                                    setState(() => valueRecovered = value),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      _gap(),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -324,4 +484,18 @@ Widget _gap() => const SizedBox(height: 16);
 DropdownMenuItem<String> buildMenuItem(String sex) => DropdownMenuItem(
       value: sex,
       child: Text(sex),
+    );
+DropdownMenuItem<String> buildMenuItemStatus(String status) => DropdownMenuItem(
+      value: status,
+      child: Text(status),
+    );
+DropdownMenuItem<String> buildMenuItemAdmitted(String admitted) =>
+    DropdownMenuItem(
+      value: admitted,
+      child: Text(admitted),
+    );
+DropdownMenuItem<String> buildMenuItemRecovered(String recovered) =>
+    DropdownMenuItem(
+      value: recovered,
+      child: Text(recovered),
     );

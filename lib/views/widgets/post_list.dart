@@ -102,27 +102,27 @@ class _PostsListState extends State<PostsList> {
             // Format the DateTime to display only the date
             String formattedDate = DateFormat('MMMMd').format(dateTime);
 
-            return InkWell(
-              onTap: () {
-                getUserType(data);
-              },
-              child: Container(
-                margin: isLargeScreen
-                    ? const EdgeInsets.symmetric(horizontal: 250, vertical: 20)
-                    : const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.white,
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      spreadRadius: 2,
-                      blurRadius: 2,
-                      offset: Offset(2, 2),
-                    ),
-                  ],
-                ),
-                width: double.infinity,
+            return Container(
+              margin: isLargeScreen
+                  ? const EdgeInsets.symmetric(horizontal: 250, vertical: 20)
+                  : const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    spreadRadius: 2,
+                    blurRadius: 2,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+              width: double.infinity,
+              child: InkWell(
+                onTap: () {
+                  getUserType(data);
+                },
                 child: Column(
                   children: <Widget>[
                     // ignore: avoid_unnecessary_containers

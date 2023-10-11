@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_viewreportedcasespage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class ReportListWidget extends StatefulWidget {
@@ -46,12 +47,37 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
                 child: ListTile(
-                  title: Text('${'' + data['name']} | Age: ' + data['age']),
-                  subtitle: Text(data['contact_number']),
+                  title: Text(
+                    '${'' + data['name']} | Age: ' + data['age'],
+                    style: GoogleFonts.poppins(fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  subtitle: Text(
+                    data['contact_number'],
+                    style: GoogleFonts.poppins(fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(formattedDate),
+                      // Text(
+                      //   'Status',
+                      //   style: GoogleFonts.poppins(fontSize: 14),
+                      //   overflow: TextOverflow.ellipsis,
+                      //   maxLines: 1,
+                      // ),
+                      // const SizedBox(
+                      //   width: 8,
+                      // ),
+
+                      Text(
+                        formattedDate,
+                        style: GoogleFonts.poppins(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                       const SizedBox(
                         width: 24,
                       ),
@@ -77,6 +103,24 @@ class _ReportListWidgetState extends State<ReportListWidget> {
           // }).toList(),
         );
       },
+    );
+  }
+}
+
+class StatusIcon extends StatelessWidget {
+  final Color color;
+
+  const StatusIcon({super.key, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 10.0, // diameter
+      height: 10.0, // diameter
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

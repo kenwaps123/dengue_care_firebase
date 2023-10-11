@@ -23,18 +23,18 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
         floatingActionButton: FloatingActionButton(
           heroTag: 'Pickerfile',
           onPressed: () async {
-            PermissionStatus status = await Permission.storage.request();
-            if (status == PermissionStatus.granted) {
-              _pickAndUploadFile();
-            }
-            if (status == PermissionStatus.denied) {
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("this persdkfsf")));
-              print(status.toString());
-            }
+            // PermissionStatus status = await Permission.storage.request();
+            // if (status == PermissionStatus.granted) {
+            //   _pickAndUploadFile();
+            // }
+            // if (status == PermissionStatus.denied) {
+            //   // ignore: use_build_context_synchronously
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //       const SnackBar(content: Text("this persdkfsf")));
+            //   print(status.toString());
+            // }
 
-            print(status.toString());
+            // print(status.toString());
           },
           tooltip: 'Pick A File',
           child: const Icon(Icons.add),
