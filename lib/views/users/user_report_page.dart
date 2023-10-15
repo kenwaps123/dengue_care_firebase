@@ -452,6 +452,7 @@ class _UserReportPageState extends State<UserReportPage> {
         'lowPlateLet': _lowPlateLet,
         'date': FieldValue.serverTimestamp(),
         'emailid': user!.email!,
+        'status': 'Suspected',
         // Add other fields as necessary
       });
 

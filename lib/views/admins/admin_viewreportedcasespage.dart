@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_reportpage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +20,17 @@ class AdminViewReportedCasesPage extends StatefulWidget {
 
 class _AdminViewReportedCasesPageState
     extends State<AdminViewReportedCasesPage> {
+  bool _isSubmitting = false;
+  Widget _buildProgressIndicator() {
+    if (_isSubmitting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else {
+      return Container(); // Return an empty container if _isSubmitting is false
+    }
+  }
+
   String? value;
   final sex = ['Male', 'Female'];
   String? valueStatus;
@@ -69,6 +82,7 @@ class _AdminViewReportedCasesPageState
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      _buildProgressIndicator(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text("Reported Case",
@@ -326,7 +340,7 @@ class _AdminViewReportedCasesPageState
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 items: status.map(buildMenuItemStatus).toList(),
-                                value: valueStatus,
+                                value: widget.reportedCaseData['status'],
                                 hint: const Text(' '),
                                 onChanged: (value) =>
                                     setState(() => valueStatus = value),
@@ -478,6 +492,37 @@ class _AdminViewReportedCasesPageState
       ),
     );
   }
+
+  void uploadDataToFirebase() async {
+    setState(() {
+      _isSubmitting = true; // Begin submission
+    });
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    try {
+      CollectionReference reports =
+          FirebaseFirestore.instance.collection('reports');
+      const CircularProgressIndicator();
+      await reports.add({
+        // Add other fields as necessary
+      });
+
+      // ignore: use_build_context_synchronously
+      _showSnackbarSuccess(context, 'Success');
+    } catch (e) {
+      //  Utils.showSnackBar(e.toString());
+    } finally {
+      _isSubmitting = false;
+    }
+  }
+}
+
+void _showSnackbarSuccess(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.green,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
 Widget _gap() => const SizedBox(height: 16);

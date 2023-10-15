@@ -38,7 +38,8 @@ class _ReportListWidgetState extends State<ReportListWidget> {
             DateTime dateTime = (data['date'] as Timestamp).toDate();
 
             // Format the DateTime to display only the date
-            String formattedDate = DateFormat('MMMMd').format(dateTime);
+            String formattedDate = DateFormat('MM/d').format(dateTime);
+
             return Container(
               width: 50,
               padding: const EdgeInsets.all(8.0),
@@ -47,11 +48,22 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
                 child: ListTile(
-                  title: Text(
-                    '${'' + data['name']} | Age: ' + data['age'],
-                    style: GoogleFonts.poppins(fontSize: 14),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data['name'],
+                        style: GoogleFonts.poppins(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      Text(
+                        'Age: ' + data['age'],
+                        style: GoogleFonts.poppins(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ],
                   ),
                   subtitle: Text(
                     data['contact_number'],
