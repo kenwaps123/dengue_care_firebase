@@ -24,7 +24,7 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
       backgroundColor: Colors.white10,
       body: testChart(),
       floatingActionButton: FloatingActionButton(
-        heroTag: '12222',
+        heroTag: '1312312312',
         onPressed:
             _pickAndUploadFile /*() async {
           PermissionStatus status = await Permission.storage.request();
