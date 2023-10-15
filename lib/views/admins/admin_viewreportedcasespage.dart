@@ -474,7 +474,7 @@ class _AdminViewReportedCasesPageState
                           child: const Padding(
                             padding: EdgeInsets.all(10.0),
                             child: Text(
-                              'Submitssss',
+                              'Submit',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
