@@ -455,17 +455,29 @@ class _UserReportPageState extends State<UserReportPage> {
         'status': 'Suspected',
         // Add other fields as necessary
       });
-
-      UtilSuccess.showSuccessSnackBar(
-        text: 'Success!',
-        action: SnackBarAction(label: 'text', onPressed: () {}),
-      );
     } catch (e) {
-      //  Utils.showSnackBar(e.toString());
+      _showSnackbarError(context, e.toString());
     } finally {
       _isSubmitting = false;
       resetForm();
+      _showSnackbarSuccess(context, "SUCCESS");
     }
+  }
+
+  void _showSnackbarSuccess(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void _showSnackbarError(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   void resetForm() {

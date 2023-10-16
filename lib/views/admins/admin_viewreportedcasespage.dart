@@ -11,6 +11,7 @@ import '../widgets/input_widget.dart';
 
 class AdminViewReportedCasesPage extends StatefulWidget {
   final Map<String, dynamic> reportedCaseData;
+
   const AdminViewReportedCasesPage({super.key, required this.reportedCaseData});
 
   @override
@@ -31,6 +32,7 @@ class _AdminViewReportedCasesPageState
     }
   }
 
+  final TextEditingController _hospitalnameController = TextEditingController();
   String? value;
   final sex = ['Male', 'Female'];
   String? valueStatus;
@@ -340,7 +342,8 @@ class _AdminViewReportedCasesPageState
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 items: status.map(buildMenuItemStatus).toList(),
-                                value: widget.reportedCaseData['status'],
+                                value: widget.reportedCaseData['status'] ??
+                                    valueStatus,
                                 hint: const Text(' '),
                                 onChanged: (value) =>
                                     setState(() => valueStatus = value),
@@ -363,8 +366,10 @@ class _AdminViewReportedCasesPageState
                               children: [
                                 const Text("Date of first symptom:"),
                                 const SizedBox(width: 16),
-                                Text("${selectedDateofSymptoms.toLocal()}"
-                                    .split(' ')[0]),
+                                Text(widget.reportedCaseData[
+                                        'first_symptom_date'] ??
+                                    "${selectedDateofSymptoms.toLocal()}"
+                                        .split(' ')[0]),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -405,7 +410,9 @@ class _AdminViewReportedCasesPageState
                                       items: admitted
                                           .map(buildMenuItemAdmitted)
                                           .toList(),
-                                      value: valueAdmitted,
+                                      value: widget.reportedCaseData[
+                                              'patient_admitted'] ??
+                                          valueAdmitted,
                                       hint: const Text(' '),
                                       onChanged: (value) =>
                                           setState(() => valueAdmitted = value),
@@ -424,7 +431,10 @@ class _AdminViewReportedCasesPageState
                               children: [
                                 Expanded(
                                   child: TextFormField(
+                                    controller: _hospitalnameController,
                                     enabled: true,
+                                    initialValue: widget
+                                        .reportedCaseData['hospital_name'],
                                     decoration: const InputDecoration(
                                       labelText: 'Hospital name',
                                       prefixIcon:
@@ -454,7 +464,9 @@ class _AdminViewReportedCasesPageState
                                 items: recovered
                                     .map(buildMenuItemRecovered)
                                     .toList(),
-                                value: valueRecovered,
+                                value: widget.reportedCaseData[
+                                        'patient_recovered'] ??
+                                    valueRecovered,
                                 hint: const Text(' '),
                                 onChanged: (value) =>
                                     setState(() => valueRecovered = value),
@@ -479,7 +491,9 @@ class _AdminViewReportedCasesPageState
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            updateDataToFirebase();
+                          },
                         ),
                       ),
                     ],
@@ -493,7 +507,7 @@ class _AdminViewReportedCasesPageState
     );
   }
 
-  void uploadDataToFirebase() async {
+  void updateDataToFirebase() async {
     setState(() {
       _isSubmitting = true; // Begin submission
     });
@@ -503,18 +517,35 @@ class _AdminViewReportedCasesPageState
       CollectionReference reports =
           FirebaseFirestore.instance.collection('reports');
       const CircularProgressIndicator();
+      // Get the current date
+      DateTime currentDate = DateTime.now();
+
+      // Format the date as a string in "YYYY-MM-DD" format
+      String formattedDateOnly =
+          "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
       await reports.add({
         // Add other fields as necessary
+        'status': valueStatus,
+        'first_symptom_date': formattedDateOnly,
+        'patient_admitted': valueAdmitted,
+        'hospital_name': _hospitalnameController.text,
+        'patient_recovered': valueRecovered,
       });
-
-      // ignore: use_build_context_synchronously
-      _showSnackbarSuccess(context, 'Success');
     } catch (e) {
-      //  Utils.showSnackBar(e.toString());
+      _showSnackbarError(context, e.toString());
     } finally {
       _isSubmitting = false;
+      _showSnackbarSuccess(context, 'Success');
     }
   }
+}
+
+void _showSnackbarError(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.red,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
 void _showSnackbarSuccess(BuildContext context, String message) {
