@@ -10,7 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'firebase_options.dart';
-import 'utility/utils.dart';
+
 import 'package:flutter/services.dart';
 
 Future main() async {
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GetMaterialApp(
-        scaffoldMessengerKey: Utils.messengerKey,
+        //scaffoldMessengerKey: Utils.messengerKey,
         navigatorKey: navigatorKey,
         theme: ThemeData(primarySwatch: Colors.green),
         debugShowCheckedModeBanner: false,

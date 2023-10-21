@@ -1,4 +1,3 @@
-import 'package:denguecare_firebase/utility/utils_success.dart';
 import 'package:denguecare_firebase/views/users/user_homepage.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
-import '../../utility/utils.dart';
 import '../login_page.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_confirmpass_widget.dart';
@@ -145,7 +143,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                                   verifyPhone(num);
                                 }
                               } on FirebaseAuthException catch (e) {
-                                Utils.showSnackBar(e.message);
+                                _showSnackbarError(
+                                    context, e.message.toString());
                               }
                             },
                             child: Text("Register",
@@ -186,14 +185,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   }
 
   Widget _cardOTPDialog(BuildContext context) {
-    void _showSnackbarSuccess(BuildContext context, String message) {
-      final snackbar = SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    }
-
     return AlertDialog(
       title: Text(
         'Verify your phone number',
@@ -272,14 +263,11 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               _contactNumberController.text.trim(),
                               userType);
 
-                          UtilSuccess.showSuccessSnackBar(
-                              text: "Success",
-                              action: SnackBarAction(
-                                  label: 'Text', onPressed: () {}));
+                          _showSnackbarSuccess(context, 'Success');
 
                           // Handle user registration completion
                         } on FirebaseAuthException catch (e) {
-                          Utils.showSnackBar(e.message);
+                          _showSnackbarError(context, e.message.toString());
                         }
                       },
                       child: Text("Confirm",
@@ -320,11 +308,11 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                     email, name, age, sex, contactnumber, userType)
               })
           .catchError((e) {
-        return Utils.showSnackBar(e.message);
+        return _showSnackbarError(context, e.message.toString());
       });
     } on FirebaseAuthException catch (e) {
       //print(e);
-      Utils.showSnackBar(e.message);
+      _showSnackbarError(context, e.message.toString());
     }
   }
 
@@ -353,7 +341,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
     verificationFailed(FirebaseAuthException e) {
       // Handle verification failure
-      Utils.showSnackBar(e.message);
+
+      _showSnackbarError(context, e.message.toString());
     }
 
     codeSent(String verificationId, [int? resendToken]) async {
@@ -373,4 +362,20 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
     );
   }
+}
+
+void _showSnackbarError(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.red,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
+}
+
+void _showSnackbarSuccess(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.green,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }

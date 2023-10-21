@@ -7,12 +7,8 @@ import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
 import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'dart:math' as math;
-
 import 'package:get/get.dart';
-
-import '../../utility/utils.dart';
 import '../login_page.dart';
 import 'admin_dataviz.dart';
 import 'admin_reportpage.dart';
@@ -70,7 +66,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
       return documentSnapshot.get('role')
           as String?; // Cast to String, but ensure the 'role' field always contains a string or null
     } else {
-      Utils.showSnackBar('Document does not exist on the database');
+      // ignore: use_build_context_synchronously
+      _showSnackbarError(context, 'Document does not exist on the database');
       return null;
     }
   }
@@ -84,6 +81,22 @@ class _AdminHomePageState extends State<AdminHomePage> {
       // Do whatever you want with the role
     }
     return null;
+  }
+
+  void _showSnackbarError(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void _showSnackbarSuccess(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   int currentIndex = 0;

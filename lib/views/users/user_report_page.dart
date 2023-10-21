@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../utility/utils_success.dart';
+import 'package:uuid/uuid.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_widget.dart';
@@ -16,6 +15,20 @@ class UserReportPage extends StatefulWidget {
 }
 
 class _UserReportPageState extends State<UserReportPage> {
+  final uuid = const Uuid();
+  String uniqueId = '';
+  @override
+  void initState() {
+    super.initState();
+    generateUniqueId();
+  }
+
+  void generateUniqueId() {
+    setState(() {
+      uniqueId = uuid.v4(); // Generates a new unique ID
+    });
+  }
+
   bool _isSubmitting = false;
   Widget _buildProgressIndicator() {
     if (_isSubmitting) {
@@ -160,6 +173,7 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                         ],
                       ),
+
                       _gap(),
                       //! CONTACT NUMBER
                       InputContactNumber(
@@ -453,6 +467,7 @@ class _UserReportPageState extends State<UserReportPage> {
         'date': FieldValue.serverTimestamp(),
         'emailid': user!.email!,
         'status': 'Suspected',
+        'document_id': uniqueId,
         // Add other fields as necessary
       });
     } catch (e) {

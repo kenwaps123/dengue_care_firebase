@@ -513,30 +513,42 @@ class _AdminViewReportedCasesPageState
     });
     final FirebaseAuth auth = FirebaseAuth.instance;
     final user = auth.currentUser;
-    try {
-      CollectionReference reports =
-          FirebaseFirestore.instance.collection('reports');
-      const CircularProgressIndicator();
-      // Get the current date
-      DateTime currentDate = DateTime.now();
 
-      // Format the date as a string in "YYYY-MM-DD" format
-      String formattedDateOnly =
-          "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
-      await reports.add({
-        // Add other fields as necessary
-        'status': valueStatus,
-        'first_symptom_date': formattedDateOnly,
-        'patient_admitted': valueAdmitted,
-        'hospital_name': _hospitalnameController.text,
-        'patient_recovered': valueRecovered,
+    // Get the document_id from your widget or wherever you have it
+    String documentId = widget.reportedCaseData['document_id'];
+
+    CollectionReference reports =
+        FirebaseFirestore.instance.collection('reports');
+    DocumentReference userDocRef =
+        reports.doc(documentId); // Use the document_id here
+
+    _buildProgressIndicator();
+    // Get the current date
+    DateTime currentDate = DateTime.now();
+
+    // Format the date as a string in "YYYY-MM-DD" format
+    String formattedDateOnly =
+        "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
+
+    Map<String, dynamic> updateData = {
+      'status': valueStatus,
+      'first_symptom_date': formattedDateOnly,
+      'patient_admitted': valueAdmitted,
+      'hospital_name': _hospitalnameController.text,
+      'patient_recovered': valueRecovered,
+    };
+
+    userDocRef.update(updateData).then((value) {
+      setState(() {
+        _isSubmitting = false; // Begin submission
       });
-    } catch (e) {
-      _showSnackbarError(context, e.toString());
-    } finally {
-      _isSubmitting = false;
       _showSnackbarSuccess(context, 'Success');
-    }
+    }).catchError((error) {
+      setState(() {
+        _isSubmitting = false; // Begin submission
+      });
+      _showSnackbarError(context, error.toString());
+    });
   }
 }
 

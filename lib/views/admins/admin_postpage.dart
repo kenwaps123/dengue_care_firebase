@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/utility/utils_success.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../utility/utils.dart';
 import 'admin_homepage.dart';
 
 String imageUrl = '';
@@ -133,7 +132,7 @@ class _AdminPostPageState extends State<AdminPostPage> {
         });
       }
     } catch (e) {
-      Utils.showSnackBar(e.toString());
+      _showSnackbarError(context, e.toString());
     }
   }
 
@@ -162,14 +161,28 @@ class _AdminPostPageState extends State<AdminPostPage> {
         'uploaderUID': user.uid,
         'date': FieldValue.serverTimestamp(),
       });
-      UtilSuccess.showSuccessSnackBar(
-        text: 'Success!',
-        action: SnackBarAction(label: 'TExt', onPressed: () {}),
-      );
+
+      _showSnackbarSuccess(context, 'Success');
     } catch (e) {
       //  Utils.showSnackBar(e.toString());
     }
   }
+}
+
+void _showSnackbarError(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.red,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
+}
+
+void _showSnackbarSuccess(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.green,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
 Future<String> retrieveName() async {

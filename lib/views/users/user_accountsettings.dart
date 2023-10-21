@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/utility/utils.dart';
-import 'package:denguecare_firebase/utility/utils_success.dart';
 import 'package:denguecare_firebase/views/users/user_homepage.dart';
 import 'package:denguecare_firebase/views/widgets/input_age_widget.dart';
 import 'package:denguecare_firebase/views/widgets/input_email_widget.dart';
@@ -138,7 +136,7 @@ class _EditUserInfoScreenState extends State<EditUserInfoScreen> {
                                     _updateUserInfo();
                                   }
                                 } on FirebaseAuthException catch (e) {
-                                  Utils.showSnackBar(e.message!);
+                                  _showSnackbarError(context, e.toString());
                                 }
                               },
                               child: Text(
@@ -158,6 +156,22 @@ class _EditUserInfoScreenState extends State<EditUserInfoScreen> {
     );
   }
 
+  void _showSnackbarError(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void _showSnackbarSuccess(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
   Future<void> _updateUserInfoinFirestore(
       String uid, String newName, String newAge, String newEmail) async {
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
@@ -165,9 +179,7 @@ class _EditUserInfoScreenState extends State<EditUserInfoScreen> {
       'age': newAge,
       'email': newEmail,
     });
-    UtilSuccess.showSuccessSnackBar(
-        text: 'User Information updated successfully',
-        action: SnackBarAction(label: 'Text', onPressed: () {}));
+    _showSnackbarSuccess(context, 'User Information updated successfully');
   }
 
   Future<void> _updateUserInfo() async {
@@ -188,21 +200,5 @@ class _EditUserInfoScreenState extends State<EditUserInfoScreen> {
     } catch (error) {
       _showSnackbarError(context, error.toString());
     }
-  }
-
-  void _showSnackbarSuccess(BuildContext context, String message) {
-    final snackbar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.green,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
-  void _showSnackbarError(BuildContext context, String message) {
-    final snackbar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.green,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 }

@@ -10,8 +10,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../utility/utils.dart';
-
 class PostsList extends StatefulWidget {
   const PostsList({super.key});
 
@@ -65,7 +63,7 @@ class _PostsListState extends State<PostsList> {
           Get.offAll(() => UserViewPostPage(post: data));
         }
       } else {
-        Utils.showSnackBar('Document does not exist on the database');
+        _showSnackbarError(context, 'Document does not exist on the database');
       }
     });
   }
@@ -158,4 +156,20 @@ class _PostsListState extends State<PostsList> {
       },
     );
   }
+}
+
+void _showSnackbarError(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.red,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
+}
+
+void _showSnackbarSuccess(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.green,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }

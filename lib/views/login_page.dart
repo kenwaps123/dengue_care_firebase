@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/utility/utils.dart';
 import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:denguecare_firebase/views/users/user_homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -88,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                signIn();
+                                signIn(context);
                               }
                             },
                             child: Text(
@@ -120,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future signIn() async {
+  Future signIn(BuildContext context) async {
     try {
       showDialog(
         context: context,
@@ -134,16 +133,16 @@ class _LoginPageState extends State<LoginPage> {
           email: emailController.text.trim(),
           password: passwordController.text.trim());
 
-      route();
+      route(context);
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
-      Utils.showSnackBar(e.message);
+      _showSnackbarError(context, e.message.toString());
       Navigator.of(context).pop();
     }
   }
 }
 
-void route() {
+void route(BuildContext context) {
   User? user = FirebaseAuth.instance.currentUser;
   var kk = FirebaseFirestore.instance
       .collection('users')
@@ -159,7 +158,23 @@ void route() {
         Get.offAll(() => const UserMainPage());
       }
     } else {
-      Utils.showSnackBar('Document does not exist on the database');
+      _showSnackbarError(context, 'Document does not exist on the database');
     }
   });
+}
+
+void _showSnackbarError(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.red,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
+}
+
+void _showSnackbarSuccess(BuildContext context, String message) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: Colors.green,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
