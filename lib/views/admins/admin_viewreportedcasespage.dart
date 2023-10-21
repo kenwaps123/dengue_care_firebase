@@ -540,12 +540,12 @@ class _AdminViewReportedCasesPageState
 
     userDocRef.update(updateData).then((value) {
       setState(() {
-        _isSubmitting = false; // Begin submission
+        _isSubmitting = false; // end submission
       });
       _showSnackbarSuccess(context, 'Success');
     }).catchError((error) {
       setState(() {
-        _isSubmitting = false; // Begin submission
+        _isSubmitting = false; // end submission
       });
       _showSnackbarError(context, error.toString());
     });
