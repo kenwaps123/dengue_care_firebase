@@ -50,63 +50,11 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
-  Future<String?> getUserRole() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      // Handle user not logged in scenario, if needed
-      return null;
-    }
-
-    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
-
-    if (documentSnapshot.exists) {
-      return documentSnapshot.get('role')
-          as String?; // Cast to String, but ensure the 'role' field always contains a string or null
-    } else {
-      // ignore: use_build_context_synchronously
-      _showSnackbarError(context, 'Document does not exist on the database');
-      return null;
-    }
-  }
-
-  Future<String?> checkUserRole() async {
-    role = await getUserRole();
-    if (role != null) {
-      print("User Role: $role");
-      return role;
-
-      // Do whatever you want with the role
-    }
-    return null;
-  }
-
-  void _showSnackbarError(BuildContext context, String message) {
-    final snackbar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.red,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
-  void _showSnackbarSuccess(BuildContext context, String message) {
-    final snackbar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.green,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
-  int currentIndex = 0;
-
   static const _actionTitles = [
     'Edit Posts',
     'Create announcement',
     'Add new post',
   ];
-
   void _showAction(BuildContext context, int index) {
     showDialog<void>(
       context: context,
@@ -124,132 +72,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 
-  Text? textForAdmin(String role) {
-    Text? widget;
-
-    if (role == "Admin") {
-      return const Text(
-        'Welcome Admin',
-        style: TextStyle(fontSize: 24, color: Colors.white),
-      );
-    } else if (role == "superadmin") {
-      return const Text(
-        'Welcome Superadmin!',
-        style: TextStyle(fontSize: 24, color: Colors.white),
-      );
-    }
-
-    return null;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    checkUserRole();
-
-    // Calling the Future function when the page loads.
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: const Text('DengueCare')),
-        drawer: FutureBuilder<String?>(
-          future: checkUserRole(),
-          builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasData && snapshot.data != null) {
-                return Drawer(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      DrawerHeader(
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
-                        ),
-                        child: Text(
-                          'Welcome $role',
-                          style: const TextStyle(
-                              fontSize: 24, color: Colors.white),
-                        ),
-                      ),
-                      ListTile(
-                        title: const Text('Account Settings'),
-                        leading: const Icon(
-                          Icons.person,
-                          color: Colors.black,
-                        ),
-                        onTap: () {
-                          Get.offAll(() => const AdminAccountSettings());
-                        },
-                      ),
-                      Visibility(
-                        visible: role == 'superadmin',
-                        child: ListTile(
-                          title: const Text('Manage Admins'),
-                          leading: const Icon(
-                            Icons.person_pin_rounded,
-                            color: Colors.black,
-                          ),
-                          onTap: () {
-                            Get.offAll(() => const ManageAdmin());
-                          },
-                        ),
-                      ),
-                      ListTile(
-                        title: const Text('Prefereneces'),
-                        leading: const Icon(
-                          Icons.checklist,
-                          color: Colors.black,
-                        ),
-                        onTap: () {},
-                      ),
-                      ListTile(
-                        title: const Text('View Logs'),
-                        leading: const Icon(
-                          Icons.view_list_outlined,
-                          color: Colors.black,
-                        ),
-                        onTap: () {},
-                      ),
-                      ListTile(
-                        title: const Text(
-                          'Logout',
-                          style: TextStyle(
-                            color: Colors.red,
-                          ),
-                        ),
-                        leading: const Icon(
-                          Icons.logout_rounded,
-                          color: Colors.red,
-                        ),
-                        onTap: () {
-                          showLogoutConfirmationDialog(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              }
-              // You can also handle the null case differently, like showing a different message or a loader.
-              return const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                ),
-                child: Text('Fetching user role...'),
-              );
-            } else {
-              // This can be a loader or some placeholder till the role is fetched.
-              return const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                ),
-                child: Text('Loading...'),
-              );
-            }
-          },
-        ),
         body: const PostsList(),
         floatingActionButton: ExpandableFab(
           distance: 112,
@@ -289,29 +115,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
   //   });
   // }
 }
-
-const _navBarItemsAdmin = [
-  NavigationDestination(
-    icon: Icon(Icons.home_outlined),
-    selectedIcon: Icon(Icons.home_rounded),
-    label: 'Home',
-  ),
-  NavigationDestination(
-    icon: Icon(Icons.report_outlined),
-    selectedIcon: Icon(Icons.report_rounded),
-    label: 'Report',
-  ),
-  NavigationDestination(
-    icon: Icon(Icons.map_outlined),
-    selectedIcon: Icon(Icons.map_rounded),
-    label: 'Map',
-  ),
-  NavigationDestination(
-    icon: Icon(Icons.auto_graph_outlined),
-    selectedIcon: Icon(Icons.auto_graph_rounded),
-    label: 'Data Analytics',
-  ),
-];
 
 void handleClick(int item) {
   switch (item) {
@@ -555,6 +358,8 @@ class FakeItem extends StatelessWidget {
   }
 }
 
+//! MAIN PAGEEEE
+
 class AdminMainPage extends StatefulWidget {
   const AdminMainPage({super.key});
 
@@ -562,41 +367,226 @@ class AdminMainPage extends StatefulWidget {
   State<AdminMainPage> createState() => _AdminMainPageState();
 }
 
-class _AdminMainPageState extends State<AdminMainPage> {
-  int currentIndex = 0;
-  final screens = [
-    const AdminHomePage(),
-    const AdminReportPage(),
-    const AdminOpenStreetMap(),
-    const AdminDataVizPage(),
-  ];
-  Widget _getCurrentScreen() {
-    switch (currentIndex) {
-      case 0:
-        return const AdminHomePage();
-      case 1:
-        return const AdminReportPage();
-      case 2:
-        return const AdminOpenStreetMap();
-      case 3:
-        return const AdminDataVizPage();
-      default:
-        return const AdminHomePage();
+class _AdminMainPageState extends State<AdminMainPage>
+    with SingleTickerProviderStateMixin {
+  Future<String?> getUserRole() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // Handle user not logged in scenario, if needed
+      return null;
+    }
+
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (documentSnapshot.exists) {
+      return documentSnapshot.get('role')
+          as String?; // Cast to String, but ensure the 'role' field always contains a string or null
+    } else {
+      // ignore: use_build_context_synchronously
+      _showSnackbarError(context, 'Document does not exist on the database');
+      return null;
     }
   }
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        body: _getCurrentScreen(),
-        bottomNavigationBar: NavigationBar(
-          animationDuration: const Duration(seconds: 2),
-          selectedIndex: currentIndex,
-          onDestinationSelected: (index) {
-            setState(() {
-              currentIndex = index;
-            });
-          },
-          destinations: _navBarItemsAdmin,
-        ),
+  Future<String?> checkUserRole() async {
+    role = await getUserRole();
+    if (role != null) {
+      print("User Role: $role");
+      return role;
+
+      // Do whatever you want with the role
+    }
+    return null;
+  }
+
+  void _showSnackbarError(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void _showSnackbarSuccess(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  //int currentIndex = 0;
+
+  Text? textForAdmin(String role) {
+    Text? widget;
+
+    if (role == "Admin") {
+      return const Text(
+        'Welcome Admin',
+        style: TextStyle(fontSize: 24, color: Colors.white),
       );
+    } else if (role == "superadmin") {
+      return const Text(
+        'Welcome Superadmin!',
+        style: TextStyle(fontSize: 24, color: Colors.white),
+      );
+    }
+
+    return null;
+  }
+
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    checkUserRole();
+    _tabController = TabController(length: 4, vsync: this);
+    // Calling the Future function when the page loads.
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('DengueCare'),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(
+                icon: Icon(Icons.home_rounded),
+                text: 'Home',
+              ),
+              Tab(
+                icon: Icon(Icons.report_rounded),
+                text: 'Reports',
+              ),
+              Tab(
+                icon: Icon(Icons.map_rounded),
+                text: 'Map',
+              ),
+              Tab(
+                icon: Icon(Icons.auto_graph_rounded),
+                text: 'Data\nAnalytics',
+              ),
+            ],
+          ),
+        ),
+        drawer: FutureBuilder<String?>(
+          future: checkUserRole(),
+          builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData && snapshot.data != null) {
+                return Drawer(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: [
+                      DrawerHeader(
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                        ),
+                        child: Text(
+                          'Welcome $role',
+                          style: const TextStyle(
+                              fontSize: 24, color: Colors.white),
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text('Account Settings'),
+                        leading: const Icon(
+                          Icons.person,
+                          color: Colors.black,
+                        ),
+                        onTap: () {
+                          Get.offAll(() => const AdminAccountSettings());
+                        },
+                      ),
+                      Visibility(
+                        visible: role == 'superadmin',
+                        child: ListTile(
+                          title: const Text('Manage Admins'),
+                          leading: const Icon(
+                            Icons.person_pin_rounded,
+                            color: Colors.black,
+                          ),
+                          onTap: () {
+                            Get.offAll(() => const ManageAdmin());
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text('Prefereneces'),
+                        leading: const Icon(
+                          Icons.checklist,
+                          color: Colors.black,
+                        ),
+                        onTap: () {},
+                      ),
+                      ListTile(
+                        title: const Text('View Logs'),
+                        leading: const Icon(
+                          Icons.view_list_outlined,
+                          color: Colors.black,
+                        ),
+                        onTap: () {},
+                      ),
+                      ListTile(
+                        title: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                        leading: const Icon(
+                          Icons.logout_rounded,
+                          color: Colors.red,
+                        ),
+                        onTap: () {
+                          showLogoutConfirmationDialog(context);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+              // You can also handle the null case differently, like showing a different message or a loader.
+              return const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                ),
+                child: Text('Fetching user role...'),
+              );
+            } else {
+              // This can be a loader or some placeholder till the role is fetched.
+              return const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                ),
+                child: Text('Loading...'),
+              );
+            }
+          },
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: const [
+            AdminHomePage(),
+            AdminReportPage(),
+            AdminOpenStreetMap(),
+            AdminDataVizPage(),
+          ],
+        ),
+      ),
+    );
+  }
 }

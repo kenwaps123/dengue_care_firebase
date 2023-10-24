@@ -25,7 +25,7 @@ class _UserAccountSettingsPageState extends State<UserAccountSettingsPage> {
         title: const Text("Account Settings"),
         leading: BackButton(
           onPressed: () {
-            Get.offAll(() => const UserMainPage());
+            Get.back();
           },
         ),
       ),

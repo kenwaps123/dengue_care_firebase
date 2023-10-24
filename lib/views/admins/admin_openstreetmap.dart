@@ -40,30 +40,30 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
-      options: MapOptions(
-        center: const LatLng(7.113932, 125.624737),
-        zoom: 15.0,
+      options: const MapOptions(
+        initialCenter: LatLng(7.113932, 125.624737),
+        initialZoom: 15.0,
         maxZoom: 18.0,
         minZoom: 5.0,
       ),
       children: [
         TileLayer(
-          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          subdomains: const ['a', 'b', 'c'],
+          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         ),
         MarkerLayer(
           markers: points.map((point) {
             return Marker(
-                width: 30.0,
-                height: 30.0,
-                point: point,
-                builder: (ctx) => GestureDetector(
-                      onTap: () => _showDialog(context, point),
-                      child: Icon(
-                        Icons.circle,
-                        color: Colors.red[300],
-                      ),
-                    ));
+              child: GestureDetector(
+                onTap: () => _showDialog(context, point),
+                child: Icon(
+                  Icons.circle,
+                  color: Colors.red[300],
+                ),
+              ),
+              width: 30.0,
+              height: 30.0,
+              point: point,
+            );
           }).toList(),
         )
       ],

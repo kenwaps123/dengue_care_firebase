@@ -64,49 +64,6 @@ class _UserReportPageState extends State<UserReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Report a case'),
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          PopupMenuButton<int>(
-            padding: EdgeInsets.zero,
-            onSelected: (item) => handleClick(item),
-            itemBuilder: (context) => [
-              PopupMenuItem<int>(
-                value: 0,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.translate,
-                    color: Colors.black,
-                    size: 26,
-                  ),
-                  title: const Text('Language'),
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text("Choose Language"),
-                      content: SingleChildScrollView(
-                        child: ListBody(
-                          children: <Widget>[
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("English"),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text("Tagalog"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Form(
@@ -118,7 +75,7 @@ class _UserReportPageState extends State<UserReportPage> {
                 ),
                 child: Container(
                   padding: const EdgeInsets.all(32.0),
-                  constraints: const BoxConstraints(maxWidth: 400),
+                  constraints: const BoxConstraints(maxWidth: 700),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,

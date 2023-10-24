@@ -11,31 +11,8 @@ class UserHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Homepage'),
-        actions: <Widget>[
-          PopupMenuButton<int>(
-            padding: EdgeInsets.zero,
-            onSelected: (item) => handleClick(item),
-            itemBuilder: (context) => [
-              PopupMenuItem<int>(
-                value: 1,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.info,
-                    color: Colors.black,
-                    size: 26,
-                  ),
-                  title: const Text('About'),
-                  onTap: () {},
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: const PostsList(),
+    return const Scaffold(
+      body: PostsList(),
     );
   }
 
@@ -58,66 +35,82 @@ class UserMainPage extends StatefulWidget {
   State<UserMainPage> createState() => _UserMainPageState();
 }
 
-class _UserMainPageState extends State<UserMainPage> {
-  int currentIndex = 0;
-  final screens = [
-    const UserHomePage(),
-    const UserDengueHeatMapPage(),
-    const UserReportPage(),
-    const UserSettingsPage(),
-  ];
-  Widget _getCurrentScreen() {
-    switch (currentIndex) {
-      case 0:
-        return const UserHomePage();
-      case 1:
-        return const UserDengueHeatMapPage();
-      case 2:
-        return const UserReportPage();
-      case 3:
-        return const UserSettingsPage();
-      default:
-        return const UserHomePage();
-    }
+class _UserMainPageState extends State<UserMainPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  @override
+  void initState() {
+    super.initState();
+
+    _tabController = TabController(length: 4, vsync: this);
+    // Calling the Future function when the page loads.
   }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  int currentIndex = 0;
+  final screens = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _getCurrentScreen(),
-      bottomNavigationBar: NavigationBar(
-        animationDuration: const Duration(seconds: 1),
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-        },
-        destinations: _navBarItemsUser,
+      appBar: AppBar(
+        title: const Text('DengueCare'),
+        actions: <Widget>[
+          PopupMenuButton<int>(
+            padding: EdgeInsets.zero,
+            onSelected: (item) => handleClick(item),
+            itemBuilder: (context) => [
+              PopupMenuItem<int>(
+                value: 1,
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.info,
+                    color: Colors.black,
+                    size: 26,
+                  ),
+                  title: const Text('About'),
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.home_rounded),
+              text: 'Home',
+            ),
+            Tab(
+              icon: Icon(Icons.map_rounded),
+              text: 'Map',
+            ),
+            Tab(
+              icon: Icon(Icons.report_rounded),
+              text: 'Reports',
+            ),
+            Tab(
+              icon: Icon(Icons.settings_rounded),
+              text: 'Settings',
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          UserHomePage(),
+          UserDengueHeatMapPage(),
+          UserReportPage(),
+          UserSettingsPage(),
+        ],
       ),
     );
   }
 }
-
-const _navBarItemsUser = [
-  NavigationDestination(
-    icon: Icon(Icons.home_outlined),
-    selectedIcon: Icon(Icons.home_rounded),
-    label: 'Home',
-  ),
-  NavigationDestination(
-    icon: Icon(Icons.map_outlined),
-    selectedIcon: Icon(Icons.map_rounded),
-    label: 'Map',
-  ),
-  NavigationDestination(
-    icon: Icon(Icons.report_outlined),
-    selectedIcon: Icon(Icons.report_rounded),
-    label: 'Report',
-  ),
-  NavigationDestination(
-    icon: Icon(Icons.settings_outlined),
-    selectedIcon: Icon(Icons.settings_rounded),
-    label: 'Settings',
-  ),
-];

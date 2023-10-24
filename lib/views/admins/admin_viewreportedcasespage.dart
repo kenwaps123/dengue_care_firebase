@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/views/admins/admin_reportpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,7 +64,7 @@ class _AdminViewReportedCasesPageState
           title: const Text('Case Details'),
           leading: BackButton(
             onPressed: () {
-              Get.offAll(() => const AdminReportPage());
+              Get.back();
             },
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class UserDengueHeatMapPage extends StatefulWidget {
   const UserDengueHeatMapPage({super.key});
@@ -9,35 +10,63 @@ class UserDengueHeatMapPage extends StatefulWidget {
 }
 
 class _UserDengueHeatMapPageState extends State<UserDengueHeatMapPage> {
-  late MapboxMapController controller;
+  final List<LatLng> points = [
+    const LatLng(7.113932, 125.624737),
+    const LatLng(7.11310, 125.624430),
+    const LatLng(7.1200, 125.624737),
+  ];
+
+  void _showDialog(BuildContext context, LatLng point) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Point Details'),
+          content: Text(
+              'Latitude: ${point.latitude}, Longitude: ${point.longitude}'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          MapboxMap(
-            onMapCreated: (ctrl) {
-              controller = ctrl;
-            },
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(7.113932, 125.624737),
-              zoom: 17,
-            ),
-            accessToken:
-                'pk.eyJ1IjoicmFkb29vMTIzMyIsImEiOiJjbG1leGMzcDUxY3M1M3BqcjA2cW54MzNnIn0.bPXRrLqk3bwMKvKnJdiCyA',
-          ),
-          Positioned(
-            bottom: 16.0,
-            right: 16.0,
-            child: FloatingActionButton(
-              heroTag: 'Map',
-              child: const Icon(Icons.satellite),
-              onPressed: () {},
-            ),
-          ),
-        ],
+    return FlutterMap(
+      options: const MapOptions(
+        initialCenter: LatLng(7.113932, 125.624737),
+        initialZoom: 15.0,
+        maxZoom: 18.0,
+        minZoom: 5.0,
       ),
+      children: [
+        TileLayer(
+          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        ),
+        MarkerLayer(
+          markers: points.map((point) {
+            return Marker(
+              child: GestureDetector(
+                onTap: () => _showDialog(context, point),
+                child: Icon(
+                  Icons.circle,
+                  color: Colors.red[300],
+                ),
+              ),
+              width: 30.0,
+              height: 30.0,
+              point: point,
+            );
+          }).toList(),
+        )
+      ],
     );
   }
 }

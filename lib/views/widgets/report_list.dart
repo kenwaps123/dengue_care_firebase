@@ -95,7 +95,9 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                       ),
                       IconButton(
                         onPressed: () {
-                          Get.offAll(() => AdminViewReportedCasesPage(
+                          // Get.offAll(() => AdminViewReportedCasesPage(
+                          //     reportedCaseData: data));
+                          Get.to(() => AdminViewReportedCasesPage(
                               reportedCaseData: data));
                         },
                         icon: const Icon(Icons.edit_note_rounded),

@@ -5,7 +5,6 @@ import 'package:csv/csv.dart';
 import 'package:denguecare_firebase/charts/testchart.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 // import 'package:denguecare_firebase/charts/linechart.dart';
 // import 'package:denguecare_firebase/charts/linechart2.dart';
@@ -22,7 +21,7 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white10,
-      body: testChart(),
+      body: const testChart(),
       floatingActionButton: FloatingActionButton(
         heroTag: 'Pickerfile',
         onPressed:
