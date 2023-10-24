@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+final String baseUrl = 'https://api.semaphore.co/api/v4/messages';
+
 class SemaphoreAPI {
   late String apikey;
   final String baseUrl = 'https://api.semaphore.co/api/v4/messages';
@@ -156,31 +158,27 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
     );
   }
 
-  void sendSMS(String announcement) async {
-    final announcement = announcementController.text;
-    if (announcement.isNotEmpty) {
-      final firestoreCollection =
-          FirebaseFirestore.instance.collection('users');
+  Future<bool> sendSMS(String message, List<String> phoneNumbers) {
+    final url = Uri.parse(baseUrl);
+    final headers = {
+      'Authorization': 'Bearer $apikey',
+      'Content-Type': 'application/json',
+    };
+    final data = {
+      'messages': phoneNumbers.map((phoneNumber) {
+        return {'content': message, 'to': phoneNumber};
+      }).toList(),
+    };
 
-      firestoreCollection.get().then((QuerySnapshot snapshot) {
-        final phoneNumbers = snapshot.docs
-            .map((doc) {
-              return doc['contact_number'];
-            })
-            .whereType<String>()
-            .toList();
-
-        // Send SMS to each fetched phone number
-        for (var phoneNumber in phoneNumbers) {
-          semaphoreAPI.sendSMS(announcement, [phoneNumber]);
-          announcementController.clear();
-          continue;
-        }
-      }).catchError((error) {
-        _showSnackbarError(
-            context, 'Error fetching phone numbers from Firestore: $error');
-      });
-    }
+    return http
+        .post(
+      url,
+      headers: headers,
+      body: jsonEncode(data),
+    )
+        .then((response) {
+      return response.statusCode == 200;
+    });
   }
 
   void _showSnackbarSuccess(BuildContext context, String message) {

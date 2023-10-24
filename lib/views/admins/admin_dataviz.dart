@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,13 +18,24 @@ class AdminDataVizPage extends StatefulWidget {
 }
 
 class _AdminDataVizPageState extends State<AdminDataVizPage> {
+  bool isUploading = false;
+  double progress = 0.0;
+
+  StreamController<double> _progressController = StreamController<double>();
+
+  @override
+  void dispose() {
+    _progressController.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white10,
       body: const testChart(),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'Pickerfile',
+        heroTag: '1312312312',
         onPressed:
             _pickAndUploadFile /*() async {
           PermissionStatus status = await Permission.storage.request();
@@ -63,6 +75,17 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
         FirebaseFirestore.instance.collection('denguelinelist');
 
     //List<Map<String, dynamic>> dataList = [];
+    // Set the state to indicate that file upload is in progress
+    setState(() {
+      isUploading = true;
+    });
+
+    _progressController.stream.listen((event) {
+      setState(() {
+        progress = event;
+      });
+    });
+
     try {
       FilePickerResult? pickedfile = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -78,7 +101,7 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
         List<List<dynamic>> data = [];
         data = csvTable;
 
-        for (var i = 0; i < data.length; i++) {
+        for (var i = 1; i < data.length; i++) {
           var record = {
             'Region': data[i][0],
             'Province': data[i][1],
@@ -133,7 +156,6 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
           final existingRecords = await addDLL
               .where('FullName', isEqualTo: record['FullName'])
               .where('DateOfEntry', isEqualTo: record['DateOfEntry'])
-              // Add more where clauses for other fields as needed
               .get();
 
           if (existingRecords.docs.isEmpty) {
@@ -144,7 +166,11 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
             // If a similar record exists, handle it (skip or update)
             print('Redundant data found for record $i');
           }
+          _progressController.add(i / data.length);
         }
+        setState(() {
+          isUploading = false;
+        });
       }
     } catch (e) {
       print('Error: $e');
