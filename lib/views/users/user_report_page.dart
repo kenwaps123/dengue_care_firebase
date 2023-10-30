@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
@@ -64,6 +65,14 @@ class _UserReportPageState extends State<UserReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Case Details'),
+        leading: BackButton(
+          onPressed: () {
+            Get.back();
+          },
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Form(
@@ -143,6 +152,38 @@ class _UserReportPageState extends State<UserReportPage> {
                         labelText: "Address",
                         controller: _addressController,
                         obscureText: false,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InputWidget(
+                              hintText: "Name",
+                              controller: _nameController,
+                              obscureText: false,
+                            ),
+                          ),
+                          Expanded(
+                            child: InputWidget(
+                              hintText: "Name",
+                              controller: _nameController,
+                              obscureText: false,
+                            ),
+                          ),
+                          Expanded(
+                            child: InputWidget(
+                              hintText: "Name",
+                              controller: _nameController,
+                              obscureText: false,
+                            ),
+                          ),
+                          Expanded(
+                            child: InputWidget(
+                              hintText: "Name",
+                              controller: _nameController,
+                              obscureText: false,
+                            ),
+                          ),
+                        ],
                       ),
                       _gap(),
                       Padding(

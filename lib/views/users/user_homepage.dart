@@ -1,5 +1,6 @@
 import 'package:denguecare_firebase/views/users/user_dengueheatmap.dart';
 import 'package:denguecare_firebase/views/users/user_report_page.dart';
+import 'package:denguecare_firebase/views/users/user_report_page_menu.dart';
 import 'package:denguecare_firebase/views/users/user_settings_page.dart';
 import 'package:denguecare_firebase/views/widgets/post_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -107,7 +108,7 @@ class _UserMainPageState extends State<UserMainPage>
         children: const [
           UserHomePage(),
           UserDengueHeatMapPage(),
-          UserReportPage(),
+          UserReportPageMenu(),
           UserSettingsPage(),
         ],
       ),
