@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_accountsettings.dart';
-import 'package:denguecare_firebase/views/admins/admin_announcements.dart';
+import 'package:denguecare_firebase/views/admins/admin_announcements-work';
 import 'package:denguecare_firebase/views/admins/admin_manageadmin.dart';
 import 'package:denguecare_firebase/views/admins/admin_openstreetmap.dart';
 import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
@@ -86,7 +86,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             ),
             ActionButton(
               onPressed: () {
-                Get.offAll(() => const AdminAnnouncementPage());
+                Get.offAll(() => AdminAnnouncementPage());
               },
               icon: const Icon(Icons.announcement),
             ),
