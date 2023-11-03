@@ -15,8 +15,8 @@ import 'package:flutter/services.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  //FirebaseFirestore.instance.settings =
-  //const Settings(persistenceEnabled: true);
+  // FirebaseFirestore.instance.settings =
+  //     const Settings(persistenceEnabled: true);
 //SemaphoreAPI();
   runApp(const MyApp());
 }

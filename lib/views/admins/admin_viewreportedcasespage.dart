@@ -34,11 +34,11 @@ class _AdminViewReportedCasesPageState
   final TextEditingController _hospitalnameController = TextEditingController();
   String? value;
   final sex = ['Male', 'Female'];
-  String? valueStatus;
+  String? valueStatus = 'Suspected';
   final status = ['Suspected', 'Probable', 'Confirmed'];
-  String? valueAdmitted;
+  String? valueAdmitted = 'Yes';
   final admitted = ["Yes", "No"];
-  String? valueRecovered;
+  String? valueRecovered = 'Yes';
   final recovered = ["Yes", "No"];
 
   DateTime selectedDateofSymptoms = DateTime.now();
