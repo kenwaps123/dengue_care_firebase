@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:denguecare_firebase/charts/testchart.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-// import 'package:denguecare_firebase/charts/linechart.dart';
-// import 'package:denguecare_firebase/charts/linechart2.dart';
+List<List<dynamic>> data = [];
 
 class AdminDataVizPage extends StatefulWidget {
   const AdminDataVizPage({super.key});
@@ -18,15 +16,22 @@ class AdminDataVizPage extends StatefulWidget {
 }
 
 class _AdminDataVizPageState extends State<AdminDataVizPage> {
+  bool isLoading = false;
   bool isUploading = false;
-  double progress = 0.0;
 
-  StreamController<double> _progressController = StreamController<double>();
+  void showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Loading...'),
+        content: CircularProgressIndicator(),
+      ),
+    );
+  }
 
-  @override
-  void dispose() {
-    _progressController.close();
-    super.dispose();
+  void dismissLoadingDialog() {
+    Navigator.of(context).pop();
   }
 
   @override
@@ -36,54 +41,21 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
       body: const testChart(),
       floatingActionButton: FloatingActionButton(
         heroTag: '1312312312',
-        onPressed:
-            _pickAndUploadFile /*() async {
-          PermissionStatus status = await Permission.storage.request();
-          if (status == PermissionStatus.granted) {
-            _pickAndUploadFile();
-          }
-          if (status == PermissionStatus.denied) {
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text("this persdkfsf")));
-          }
-
-          print(status.toString());
-        }*/
-        ,
+        onPressed: () async {
+          showLoadingDialog();
+          await _pickAndUploadFile();
+          dismissLoadingDialog();
+        },
         tooltip: 'Pick A File',
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  // void requestStoragePermission() async {
-  //   PermissionStatus status = await Permission.storage.request();
-
-  //   if (status.isGranted) {
-  //     _pickAndUploadFile();
-  //     // You can now use the storage
-  //   } else if (status.isPermanentlyDenied) {
-  //     // The user chose to never ask again. You can instruct them to manually enable it from the settings.
-  //   } else {
-  //     // The permission was denied (possibly temporary)
-  //   }
-  // }
-
   Future<void> _pickAndUploadFile() async {
-    final CollectionReference addDLL =
-        FirebaseFirestore.instance.collection('denguelinelist');
-
-    //List<Map<String, dynamic>> dataList = [];
-    // Set the state to indicate that file upload is in progress
     setState(() {
+      isLoading = true;
       isUploading = true;
-    });
-
-    _progressController.stream.listen((event) {
-      setState(() {
-        progress = event;
-      });
     });
 
     try {
@@ -97,83 +69,101 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
         final csvString = String.fromCharCodes(bytes);
         List<List<dynamic>> csvTable =
             const CsvToListConverter().convert(csvString);
-        //print(csvString);
-        List<List<dynamic>> data = [];
-        data = csvTable;
 
-        for (var i = 1; i < data.length; i++) {
-          var record = {
-            'Region': data[i][0],
-            'Province': data[i][1],
-            'Muncity': data[i][2],
-            'Streetpurok': data[i][3],
-            'DateOfEntry': data[i][4],
-            'DRU': data[i][5],
-            'PatientNumber': data[i][6],
-            'FirstName': data[i][7],
-            'FamilyName': data[i][8],
-            'FullName': data[i][9],
-            'AgeYears': data[i][10],
-            'AgeMons': data[i][11],
-            'AgeDays': data[i][12],
-            'Sex': data[i][13],
-            'AddressOfDRU': data[i][14],
-            'ProvOfDRU': data[i][15],
-            'MuncityOfDRU': data[i][16],
-            'DOB': data[i][17],
-            'Admitted': data[i][18],
-            'DAdmit': data[i][19],
-            'DOnset': data[i][20],
-            'Type': data[i][21],
-            'LabTest': data[i][22],
-            'LabRes': data[i][23],
-            'ClinClass': data[i][24],
-            'CaseClassification': data[i][25],
-            'Outcome': data[i][26],
-            'RegionOfDrU': data[i][27],
-            'EPIID': data[i][28],
-            'DateDied': data[i][29],
-            'Icd10Code': data[i][30],
-            'MorbidityMonth': data[i][31],
-            'MorbidityWeek': data[i][32],
-            'AdmitToEntry': data[i][33],
-            'OnsetToAdmit': data[i][34],
-            'SentinelSite': data[i][35],
-            'DeleteRecord': data[i][36],
-            'Year': data[i][37],
-            'Recstatus': data[i][38],
-            'UniqueKey': data[i][39],
-            'NameOfDru': data[i][40],
-            'ILHZ': data[i][41],
-            'District': data[i][42],
-            'Barangay': data[i][43],
-            'TYPEHOSPITALCLINIC': data[i][44],
-            'SENT': data[i][45],
-            'ip': data[i][6],
-            'ipgroup': data[i][47],
-          };
+        List<List<dynamic>> data = csvTable;
 
-          final existingRecords = await addDLL
-              .where('FullName', isEqualTo: record['FullName'])
-              .where('DateOfEntry', isEqualTo: record['DateOfEntry'])
-              .get();
-
-          if (existingRecords.docs.isEmpty) {
-            // If no similar record found, add it to Firestore
-            await addDLL.add(record);
-            print('Data Added');
-          } else {
-            // If a similar record exists, handle it (skip or update)
-            print('Redundant data found for record $i');
-          }
-          _progressController.add(i / data.length);
-        }
-        setState(() {
-          isUploading = false;
-        });
+        await process(data);
       }
     } catch (e) {
       print('Error: $e');
+    } finally {
+      setState(() {
+        isLoading = false; // Set isLoading to false when processing is complete
+        isUploading = false; // Set isUploading to false to hide progress
+      });
+    }
+  }
+
+  Future<void> process(List<List<dynamic>> data) async {
+    final CollectionReference addDLL =
+        FirebaseFirestore.instance.collection('denguelinelist');
+    for (var i = 1; i < data.length; i++) {
+      var record = {
+        'Region': data[i][0],
+        'Province': data[i][1],
+        'Muncity': data[i][2],
+        'Streetpurok': data[i][3],
+        'DateOfEntry': data[i][4],
+        'DRU': data[i][5],
+        'PatientNumber': data[i][6],
+        'FirstName': data[i][7],
+        'FamilyName': data[i][8],
+        'FullName': data[i][9],
+        'AgeYears': data[i][10],
+        'AgeMons': data[i][11],
+        'AgeDays': data[i][12],
+        'Sex': data[i][13],
+        'AddressOfDRU': data[i][14],
+        'ProvOfDRU': data[i][15],
+        'MuncityOfDRU': data[i][16],
+        'DOB': data[i][17],
+        'Admitted': data[i][18],
+        'DAdmit': data[i][19],
+        'DOnset': data[i][20],
+        'Type': data[i][21],
+        'LabTest': data[i][22],
+        'LabRes': data[i][23],
+        'ClinClass': data[i][24],
+        'CaseClassification': data[i][25],
+        'Outcome': data[i][26],
+        'RegionOfDrU': data[i][27],
+        'EPIID': data[i][28],
+        'DateDied': data[i][29],
+        'Icd10Code': data[i][30],
+        'MorbidityMonth': data[i][31],
+        'MorbidityWeek': data[i][32],
+        'AdmitToEntry': data[i][33],
+        'OnsetToAdmit': data[i][34],
+        'SentinelSite': data[i][35],
+        'DeleteRecord': data[i][36],
+        'Year': data[i][37],
+        'Recstatus': data[i][38],
+        'UniqueKey': data[i][39],
+        'NameOfDru': data[i][40],
+        'ILHZ': data[i][41],
+        'District': data[i][42],
+        'Barangay': data[i][43],
+        'TYPEHOSPITALCLINIC': data[i][44],
+        'SENT': data[i][45],
+        'ip': data[i][6],
+        'ipgroup': data[i][47],
+      };
+
+      final existingRecords = await addDLL
+          .where('FullName', isEqualTo: record['FullName'])
+          .where('DateOfEntry', isEqualTo: record['DateOfEntry'])
+          .get();
+
+      if (existingRecords.docs.isEmpty) {
+        await addDLL.add(record);
+        print('Data Added');
+      } else {
+        print('Redundant data found for record $i');
+      }
     }
   }
 }
+
+// void requestStoragePermission() async {
+//   PermissionStatus status = await Permission.storage.request();
+
+//   if (status.isGranted) {
+//     _pickAndUploadFile();
+//     // You can now use the storage
+//   } else if (status.isPermanentlyDenied) {
+//     // The user chose to never ask again. You can instruct them to manually enable it from the settings.
+//   } else {
+//     // The permission was denied (possibly temporary)
+//   }
+// }
+
