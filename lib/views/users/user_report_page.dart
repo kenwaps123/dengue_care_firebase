@@ -465,6 +465,10 @@ class _UserReportPageState extends State<UserReportPage> {
         'date': FieldValue.serverTimestamp(),
         'emailid': user!.email!,
         'status': 'Suspected',
+        'date_of_first_symptom': '',
+        'patient_admitted': 'No',
+        'hospital_name': ' ',
+        'patient_recovered': 'No',
         'document_id': uniqueId,
         // Add other fields as necessary
       });
