@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../login_page.dart';
 import 'admin_dataviz.dart';
 import 'admin_reportpage.dart';
@@ -459,8 +460,12 @@ class _AdminMainPageState extends State<AdminMainPage>
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('DengueCare'),
+          title: Text(
+            'DengueCare',
+            style: GoogleFonts.poppins(),
+          ),
           bottom: TabBar(
+            labelStyle: GoogleFonts.poppins(fontSize: 12),
             controller: _tabController,
             tabs: const [
               Tab(
@@ -497,12 +502,17 @@ class _AdminMainPageState extends State<AdminMainPage>
                         ),
                         child: Text(
                           'Welcome $role',
-                          style: const TextStyle(
-                              fontSize: 24, color: Colors.white),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 24,
+                          ),
                         ),
                       ),
                       ListTile(
-                        title: const Text('Account Settings'),
+                        title: Text(
+                          'Account Settings',
+                          style: GoogleFonts.poppins(),
+                        ),
                         leading: const Icon(
                           Icons.person,
                           color: Colors.black,
@@ -514,7 +524,10 @@ class _AdminMainPageState extends State<AdminMainPage>
                       Visibility(
                         visible: role == 'superadmin',
                         child: ListTile(
-                          title: const Text('Manage Admins'),
+                          title: Text(
+                            'Manage Admins',
+                            style: GoogleFonts.poppins(),
+                          ),
                           leading: const Icon(
                             Icons.person_pin_rounded,
                             color: Colors.black,
@@ -525,7 +538,10 @@ class _AdminMainPageState extends State<AdminMainPage>
                         ),
                       ),
                       ListTile(
-                        title: const Text('Prefereneces'),
+                        title: Text(
+                          'Prefereneces',
+                          style: GoogleFonts.poppins(),
+                        ),
                         leading: const Icon(
                           Icons.checklist,
                           color: Colors.black,
@@ -533,7 +549,10 @@ class _AdminMainPageState extends State<AdminMainPage>
                         onTap: () {},
                       ),
                       ListTile(
-                        title: const Text('View Logs'),
+                        title: Text(
+                          'View Logs',
+                          style: GoogleFonts.poppins(),
+                        ),
                         leading: const Icon(
                           Icons.view_list_outlined,
                           color: Colors.black,
@@ -541,9 +560,9 @@ class _AdminMainPageState extends State<AdminMainPage>
                         onTap: () {},
                       ),
                       ListTile(
-                        title: const Text(
+                        title: Text(
                           'Logout',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.red,
                           ),
                         ),

@@ -89,7 +89,7 @@ class _testChartState extends State<testChart> {
         } else {}
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Display a circular progress indicator while waiting for data.
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -110,7 +110,7 @@ class _testChartState extends State<testChart> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('Sort by: '),
+                  const Text('Sort by: '),
                   DropdownButton<int>(
                     value: selectedYear,
                     items: listYear.map((year) {
@@ -302,38 +302,40 @@ class _testChartState extends State<testChart> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Flexible(
-                        flex: 1,
-                        child: SfCircularChart(
-                            title: ChartTitle(text: 'Active Cases Age Group'),
-                            series: <CircularSeries>[
-                              PieSeries<piechartData, String>(
-                                dataSource: pieChart,
-                                pointColorMapper: (piechartData data, _) =>
-                                    data.color,
-                                xValueMapper: (piechartData data, _) =>
-                                    data.ageGroup,
-                                yValueMapper: (piechartData data, _) =>
-                                    data.number,
-                                dataLabelMapper: (piechartData data, _) =>
-                                    '${data.ageGroup}:${data.number}',
-                                dataLabelSettings: DataLabelSettings(
-                                    isVisible: true,
-                                    labelPosition:
-                                        ChartDataLabelPosition.outside),
-                              )
-                            ])),
+                      flex: 1,
+                      child: SfCircularChart(
+                        title: ChartTitle(text: 'Active Cases Age Group'),
+                        series: <CircularSeries>[
+                          PieSeries<piechartData, String>(
+                            dataSource: pieChart,
+                            pointColorMapper: (piechartData data, _) =>
+                                data.color,
+                            xValueMapper: (piechartData data, _) =>
+                                data.ageGroup,
+                            yValueMapper: (piechartData data, _) => data.number,
+                            dataLabelMapper: (piechartData data, _) =>
+                                '${data.ageGroup}:${data.number}',
+                            dataLabelSettings: const DataLabelSettings(
+                              isVisible: true,
+                              labelPosition: ChartDataLabelPosition.outside,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     Flexible(
-                        flex: 2,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Child(0-16): $a1'),
-                            Text('Young Adult(17-30): $a2'),
-                            Text('Middle Adult(31-45): $a3'),
-                            Text('Old Adult(45 above): $a4')
-                          ],
-                        ))
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Child(0-16): $a1'),
+                          Text('Young Adult(17-30): $a2'),
+                          Text('Middle Adult(31-45): $a3'),
+                          Text('Old Adult(45 above): $a4'),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -374,7 +376,7 @@ class _testChartState extends State<testChart> {
                               )
                             ],
                             primaryXAxis: CategoryAxis(
-                                labelStyle: TextStyle(fontSize: 5)),
+                                labelStyle: const TextStyle(fontSize: 5)),
                             primaryYAxis: NumericAxis(
                                 title:
                                     AxisTitle(text: 'Number of Active Cases'),
@@ -449,7 +451,7 @@ Future<List<piechartData>> queryAgeGroupsCount(int year) async {
     ageGroupCount4 = querySnapshot4.size.toDouble();
     pieChart.add(piechartData('Old Adult', ageGroupCount4, Colors.yellow));
 
-    return Future.delayed(Duration(seconds: 1), () {
+    return Future.delayed(const Duration(seconds: 1), () {
       return pieChart;
     });
   } catch (e) {
@@ -474,9 +476,9 @@ Future<List<int>> getListYear() async {
     }
 
     if (listYear.isEmpty) {
-      uniqueValues.forEach((year) {
+      for (var year in uniqueValues) {
         listYear.add(year);
-      });
+      }
     }
 
     return listYear;
@@ -509,7 +511,7 @@ Future<List<DengueData>> getYearlyDataMonth(int year) async {
       chart.add(DengueData(x, y));
     });
 
-    return Future.delayed(Duration(seconds: 1), () {
+    return Future.delayed(const Duration(seconds: 1), () {
       return chart;
     });
   } catch (e) {
@@ -541,7 +543,7 @@ Future<List<DengueData>> getYearlyDataWeek(int year) async {
       chart2.add(DengueData(x, y));
     });
 
-    return Future.delayed(Duration(seconds: 1), () {
+    return Future.delayed(const Duration(seconds: 1), () {
       return chart2;
     });
   } catch (e) {
@@ -602,7 +604,7 @@ Future<List<StreetPurokData>> getPurokCases(int year) async {
       barChart.add(StreetPurokData(x, y));
     });
 
-    return Future.delayed(Duration(seconds: 1), () {
+    return Future.delayed(const Duration(seconds: 1), () {
       return barChart;
     });
   } catch (e) {

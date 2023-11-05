@@ -44,6 +44,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
               width: 50,
               padding: const EdgeInsets.all(8.0),
               child: Card(
+                color: Colors.green[600],
                 elevation: 3.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
@@ -52,29 +53,31 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        data['name'],
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        'Name: ' + data['name'],
+                        style: GoogleFonts.poppins(
+                            fontSize: 14, color: Colors.white),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                       Text(
                         'Age: ' + data['age'],
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        style: GoogleFonts.poppins(
+                            fontSize: 14, color: Colors.white),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ],
                   ),
                   subtitle: Text(
-                    data['contact_number'],
-                    style: GoogleFonts.poppins(fontSize: 14),
+                    'Contact number: ' + data['contact_number'],
+                    style:
+                        GoogleFonts.poppins(fontSize: 11, color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const StatusIcon(color: Colors.red),
                       // Text(
                       //   'Status',
                       //   style: GoogleFonts.poppins(fontSize: 14),
@@ -85,8 +88,9 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                         width: 8,
                       ),
                       Text(
-                        formattedDate,
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        'Date: $formattedDate',
+                        style: GoogleFonts.poppins(
+                            fontSize: 12, color: Colors.white),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -100,11 +104,13 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                           Get.to(() => AdminViewReportedCasesPage(
                               reportedCaseData: data));
                         },
-                        icon: const Icon(Icons.edit_note_rounded),
+                        icon: const Icon(Icons.edit_note_rounded,
+                            color: Colors.white),
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: const Icon(Icons.check_rounded),
+                        icon: const Icon(Icons.check_rounded,
+                            color: Colors.white),
                       ),
                     ],
                   ),
@@ -117,24 +123,6 @@ class _ReportListWidgetState extends State<ReportListWidget> {
           // }).toList(),
         );
       },
-    );
-  }
-}
-
-class StatusIcon extends StatelessWidget {
-  final Color color;
-
-  const StatusIcon({super.key, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 10.0, // diameter
-      height: 10.0, // diameter
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
     );
   }
 }
