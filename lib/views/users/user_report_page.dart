@@ -470,6 +470,7 @@ class _UserReportPageState extends State<UserReportPage> {
         'hospital_name': ' ',
         'patient_recovered': 'No',
         'document_id': uniqueId,
+        'checked': 'No',
         // Add other fields as necessary
       });
     } catch (e) {

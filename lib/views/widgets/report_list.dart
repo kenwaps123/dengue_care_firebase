@@ -18,7 +18,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('reports')
-          .orderBy('date', descending: true)
+          .orderBy('checked')
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -44,7 +44,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
               width: 50,
               padding: const EdgeInsets.all(8.0),
               child: Card(
-                color: Colors.green[600],
+                color: data['checked'] == 'Yes' ? Colors.grey : Colors.white,
                 elevation: 3.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
@@ -54,15 +54,13 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                     children: [
                       Text(
                         'Name: ' + data['name'],
-                        style: GoogleFonts.poppins(
-                            fontSize: 14, color: Colors.white),
+                        style: GoogleFonts.poppins(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                       Text(
                         'Age: ' + data['age'],
-                        style: GoogleFonts.poppins(
-                            fontSize: 14, color: Colors.white),
+                        style: GoogleFonts.poppins(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -70,8 +68,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                   ),
                   subtitle: Text(
                     'Contact number: ' + data['contact_number'],
-                    style:
-                        GoogleFonts.poppins(fontSize: 11, color: Colors.white),
+                    style: GoogleFonts.poppins(fontSize: 11),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -89,8 +86,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                       ),
                       Text(
                         'Date: $formattedDate',
-                        style: GoogleFonts.poppins(
-                            fontSize: 12, color: Colors.white),
+                        style: GoogleFonts.poppins(fontSize: 12),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -104,13 +100,11 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                           Get.to(() => AdminViewReportedCasesPage(
                               reportedCaseData: data));
                         },
-                        icon: const Icon(Icons.edit_note_rounded,
-                            color: Colors.white),
+                        icon: const Icon(Icons.edit_note_rounded),
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: const Icon(Icons.check_rounded,
-                            color: Colors.white),
+                        icon: const Icon(Icons.check_rounded),
                       ),
                     ],
                   ),

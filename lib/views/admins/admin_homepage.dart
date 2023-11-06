@@ -5,6 +5,7 @@ import 'package:denguecare_firebase/views/admins/admin_manageadmin.dart';
 import 'package:denguecare_firebase/views/admins/admin_openstreetmap.dart';
 import 'package:denguecare_firebase/views/admins/admin_postpage.dart';
 import 'package:denguecare_firebase/views/widgets/post_list.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
@@ -473,8 +474,11 @@ class _AdminMainPageState extends State<AdminMainPage>
                 text: 'Home',
               ),
               Tab(
-                icon: Icon(Icons.report_rounded),
                 text: 'Reports',
+                icon: badges.Badge(
+                  badgeContent: LengthIndicator(),
+                  child: Icon(Icons.report_rounded),
+                ),
               ),
               Tab(
                 icon: Icon(Icons.map_rounded),
@@ -606,6 +610,31 @@ class _AdminMainPageState extends State<AdminMainPage>
           ],
         ),
       ),
+    );
+  }
+}
+
+class LengthIndicator extends StatelessWidget {
+  const LengthIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Access the length of the ListView
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('reports')
+          .orderBy('date', descending: true)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasData) {
+          int length = snapshot.data!.docs.length;
+          return Text(
+            '$length',
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12),
+          );
+        }
+        return const Text('Loading...');
+      },
     );
   }
 }

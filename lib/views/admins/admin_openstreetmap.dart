@@ -3,8 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 final PanelController _panelController = PanelController();
+final mapController = MapController();
 
 class AdminOpenStreetMap extends StatefulWidget {
   const AdminOpenStreetMap({super.key});
@@ -53,6 +55,7 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
         minHeight: 50.0,
         color: const Color.fromRGBO(255, 255, 255, 0),
         body: FlutterMap(
+          mapController: mapController,
           options: const MapOptions(
             initialCenter: LatLng(7.113932, 125.624737),
             initialZoom: 15.0,
