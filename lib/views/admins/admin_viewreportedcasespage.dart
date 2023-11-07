@@ -32,6 +32,14 @@ class _AdminViewReportedCasesPageState
   }
 
   final TextEditingController _hospitalnameController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+
+    // Set the default value for the text controller
+    _hospitalnameController.text = widget.reportedCaseData['hospital_name'];
+  }
+
   String? value;
   final sex = ['Male', 'Female'];
   String? valueStatus = 'Suspected';
@@ -325,7 +333,7 @@ class _AdminViewReportedCasesPageState
                           ),
                         ],
                       ),
-
+                      //! For Updates
                       _gap(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -432,8 +440,6 @@ class _AdminViewReportedCasesPageState
                                   child: TextFormField(
                                     controller: _hospitalnameController,
                                     enabled: true,
-                                    initialValue: widget
-                                        .reportedCaseData['hospital_name'],
                                     decoration: const InputDecoration(
                                       labelText: 'Hospital name',
                                       prefixIcon:
