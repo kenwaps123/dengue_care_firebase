@@ -35,7 +35,6 @@ class _AdminViewReportedCasesPageState
   @override
   void initState() {
     super.initState();
-
     // Set the default value for the text controller
     _hospitalnameController.text = widget.reportedCaseData['hospital_name'];
   }
@@ -497,8 +496,7 @@ class _AdminViewReportedCasesPageState
                             ),
                           ),
                           onPressed: () {
-                            // updateDataToFirebase();
-                            getDocumentIDs();
+                            updateDataToFirebase();
                           },
                         ),
                       ),
@@ -513,16 +511,26 @@ class _AdminViewReportedCasesPageState
     );
   }
 
-  Future<void> getDocumentIDs() async {
+  Future<String> getDocumentID() async {
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('reports');
 
-    QuerySnapshot querySnapshot = await collectionRef.get();
+    QuerySnapshot querySnapshot = await collectionRef
+        .where('document_id', isEqualTo: widget.reportedCaseData['document_id'])
+        .limit(1)
+        .get();
 
-    for (QueryDocumentSnapshot document in querySnapshot.docs) {
+    if (querySnapshot.docs.isNotEmpty) {
+      QueryDocumentSnapshot document = querySnapshot.docs[0];
       String documentID = document.id;
-      print('Document ID: $documentID');
+      return documentID;
+    } else {
+      return "No matching documents found";
     }
+  }
+
+  Future<String> fetchDocumentID() async {
+    return await getDocumentID();
   }
 
   void updateDataToFirebase() async {
@@ -532,12 +540,13 @@ class _AdminViewReportedCasesPageState
     final FirebaseAuth auth = FirebaseAuth.instance;
     final user = auth.currentUser;
 
-    // Get the document_id from your widget or wherever you have it
-    String documentId = widget.reportedCaseData['document_id'];
+    //!Retrieve Doc ID
+    String documentID = await fetchDocumentID();
 
     CollectionReference reports =
         FirebaseFirestore.instance.collection('reports');
-    DocumentReference userDocRef = reports.doc(); // Use the document_id here
+    DocumentReference userDocRef =
+        reports.doc(documentID); // Use the document_id here
 
     _buildProgressIndicator();
     // Get the current date
