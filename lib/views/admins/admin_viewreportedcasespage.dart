@@ -42,11 +42,11 @@ class _AdminViewReportedCasesPageState
 
   String? value;
   final sex = ['Male', 'Female'];
-  String? valueStatus = 'Suspected';
+  String? valueStatus;
   final status = ['Suspected', 'Probable', 'Confirmed'];
-  String? valueAdmitted = 'Yes';
+  String? valueAdmitted;
   final admitted = ["Yes", "No"];
-  String? valueRecovered = 'Yes';
+  String? valueRecovered;
   final recovered = ["Yes", "No"];
 
   DateTime selectedDateofSymptoms = DateTime.now();
@@ -349,9 +349,9 @@ class _AdminViewReportedCasesPageState
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 items: status.map(buildMenuItemStatus).toList(),
-                                value: widget.reportedCaseData['status'] ??
-                                    valueStatus,
-                                hint: const Text(' '),
+                                value: valueStatus,
+                                hint: Text(widget.reportedCaseData['status'] ??
+                                    valueStatus),
                                 onChanged: (value) =>
                                     setState(() => valueStatus = value),
                               ),
@@ -417,10 +417,10 @@ class _AdminViewReportedCasesPageState
                                       items: admitted
                                           .map(buildMenuItemAdmitted)
                                           .toList(),
-                                      value: widget.reportedCaseData[
+                                      value: valueAdmitted,
+                                      hint: Text(widget.reportedCaseData[
                                               'patient_admitted'] ??
-                                          valueAdmitted,
-                                      hint: const Text(' '),
+                                          valueAdmitted),
                                       onChanged: (value) =>
                                           setState(() => valueAdmitted = value),
                                     ),
@@ -469,10 +469,10 @@ class _AdminViewReportedCasesPageState
                                 items: recovered
                                     .map(buildMenuItemRecovered)
                                     .toList(),
-                                value: widget.reportedCaseData[
+                                value: valueRecovered,
+                                hint: Text(widget.reportedCaseData[
                                         'patient_recovered'] ??
-                                    valueRecovered,
-                                hint: const Text(' '),
+                                    valueRecovered),
                                 onChanged: (value) =>
                                     setState(() => valueRecovered = value),
                               ),
@@ -497,7 +497,8 @@ class _AdminViewReportedCasesPageState
                             ),
                           ),
                           onPressed: () {
-                            updateDataToFirebase();
+                            // updateDataToFirebase();
+                            getDocumentIDs();
                           },
                         ),
                       ),
@@ -512,6 +513,18 @@ class _AdminViewReportedCasesPageState
     );
   }
 
+  Future<void> getDocumentIDs() async {
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('reports');
+
+    QuerySnapshot querySnapshot = await collectionRef.get();
+
+    for (QueryDocumentSnapshot document in querySnapshot.docs) {
+      String documentID = document.id;
+      print('Document ID: $documentID');
+    }
+  }
+
   void updateDataToFirebase() async {
     setState(() {
       _isSubmitting = true; // Begin submission
@@ -524,8 +537,7 @@ class _AdminViewReportedCasesPageState
 
     CollectionReference reports =
         FirebaseFirestore.instance.collection('reports');
-    DocumentReference userDocRef =
-        reports.doc(documentId); // Use the document_id here
+    DocumentReference userDocRef = reports.doc(); // Use the document_id here
 
     _buildProgressIndicator();
     // Get the current date
