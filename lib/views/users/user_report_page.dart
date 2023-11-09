@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_widget.dart';
+import 'package:denguecare_firebase/lists/puroklist.dart';
 
 class UserReportPage extends StatefulWidget {
   const UserReportPage({super.key});
@@ -41,11 +43,14 @@ class _UserReportPageState extends State<UserReportPage> {
     }
   }
 
+  final _purokList = PurokList();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _contactnumberController =
       TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _doornumController = TextEditingController();
+  final TextEditingController _streetController = TextEditingController();
 
   bool _headache = false;
   bool _bodymalaise = false;
@@ -60,8 +65,66 @@ class _UserReportPageState extends State<UserReportPage> {
   bool _fever = false;
   bool _lowPlateLet = false;
   String? value;
+  String? purokvalue;
   final sex = ['Male', 'Female'];
-
+  final puroklist = <String>[
+    'Bread Village',
+    'Carnation St.',
+    'Hillside Sibdivision',
+    'Ladislawa Village',
+    'Nccc Village',
+    'NHA Buhangin',
+    'Purok Anahaw',
+    'Purok Apollo',
+    'Purok Bagong Lipunan',
+    'Purok Balite 1 and 2',
+    'Purok Birsaba',
+    'Purok Blk. 2',
+    'Purok Blk. 10',
+    'Purok Buhangin Hills',
+    'Purok Cubcub',
+    'Purok Damayan',
+    'Purok Dumanlas Proper',
+    'Purok Engan Village',
+    'Purok Kalayaan',
+    'Purok Lopzcom',
+    'Purok Lourdes',
+    'Purok Lower St Jude',
+    'Purok Maglana',
+    'Purok Mahayag',
+    'Purok Margarita',
+    'Purok Medalla Melagrosa',
+    'Purok Molave',
+    'Purok Mt. Carmel',
+    'Purok New San Isidro',
+    'Purok NIC',
+    'Purok Old San Isidro',
+    'Purok Orchids',
+    'Purok Palm Drive',
+    'Purok Panorama Village',
+    'Purok Pioneer Village',
+    'Purok Purok Pine Tree',
+    'Purok Sampaguita',
+    'Purok San Antonio',
+    'Purok Sandawa',
+    'Purok San Jose',
+    'PurokSan Lorenzo',
+    'Purok San Miguel Lower and Upper',
+    'Purok San Nicolas',
+    'Purok San Pedro Village',
+    'Purok San Vicente',
+    'Purok Spring Valley 1 and 2',
+    'Purok Sta. Cruz',
+    'Purok Sta. Maria',
+    'Purok Sta. Teresita',
+    'Purok Sto. Niño',
+    'Purok Sto. Rosario',
+    'Purok Sunflower',
+    'Purok Talisay',
+    'Purok Upper St. Jude',
+    'Purok Waling-waling',
+    'Purok Watusi'
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,40 +210,37 @@ class _UserReportPageState extends State<UserReportPage> {
                         controller: _contactnumberController,
                         obscureText: false,
                       ),
-                      _gap(),
-                      InputAddressWidget(
-                        labelText: "Address",
-                        controller: _addressController,
+                      InputWidget(
+                        hintText: "Address Line 1",
+                        controller: _doornumController,
                         obscureText: false,
                       ),
+                      _gap(),
                       Row(
                         children: [
                           Expanded(
                             child: InputWidget(
-                              hintText: "Name",
-                              controller: _nameController,
+                              hintText: "Address Line 2",
+                              controller: _streetController,
                               obscureText: false,
                             ),
                           ),
                           Expanded(
-                            child: InputWidget(
-                              hintText: "Name",
-                              controller: _nameController,
-                              obscureText: false,
-                            ),
-                          ),
-                          Expanded(
-                            child: InputWidget(
-                              hintText: "Name",
-                              controller: _nameController,
-                              obscureText: false,
-                            ),
-                          ),
-                          Expanded(
-                            child: InputWidget(
-                              hintText: "Name",
-                              controller: _nameController,
-                              obscureText: false,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  items: puroklist.map(buildMenuItem).toList(),
+                                  value: purokvalue,
+                                  hint: const Text('Purok'),
+                                  onChanged: (val) =>
+                                      setState(() => purokvalue = val),
+                                ),
+                              ),
                             ),
                           ),
                         ],
