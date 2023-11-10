@@ -10,7 +10,6 @@ import '../widgets/input_widget.dart';
 
 class AdminViewReportedCasesPage extends StatefulWidget {
   final Map<String, dynamic> reportedCaseData;
-
   const AdminViewReportedCasesPage({super.key, required this.reportedCaseData});
 
   @override
@@ -32,12 +31,6 @@ class _AdminViewReportedCasesPageState
   }
 
   final TextEditingController _hospitalnameController = TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-    // Set the default value for the text controller
-    _hospitalnameController.text = widget.reportedCaseData['hospital_name'];
-  }
 
   String? value;
   final sex = ['Male', 'Female'];
@@ -47,20 +40,77 @@ class _AdminViewReportedCasesPageState
   final admitted = ["Yes", "No"];
   String? valueRecovered;
   final recovered = ["Yes", "No"];
+  String? purokvalue;
+  final puroklist = <String>[
+    'Bread Village',
+    'Carnation St.',
+    'Hillside Sibdivision',
+    'Ladislawa Village',
+    'NCCC Village',
+    'NHA Buhangin',
+    'Purok Anahaw',
+    'Purok Apollo',
+    'Purok Bagong Lipunan',
+    'Purok Balite 1 and 2',
+    'Purok Birsaba',
+    'Purok Blk. 2',
+    'Purok Blk. 10',
+    'Purok Buhangin Hills',
+    'Purok Cubcub',
+    'Purok Damayan',
+    'Purok Dumanlas Proper',
+    'Purok Engan Village',
+    'Purok Kalayaan',
+    'Purok Lopzcom',
+    'Purok Lourdes',
+    'Purok Lower St Jude',
+    'Purok Maglana',
+    'Purok Mahayag',
+    'Purok Margarita',
+    'Purok Medalla Melagrosa',
+    'Purok Molave',
+    'Purok Mt. Carmel',
+    'Purok New San Isidro',
+    'Purok NIC',
+    'Purok Old San Isidro',
+    'Purok Orchids',
+    'Purok Palm Drive',
+    'Purok Panorama Village',
+    'Purok Pioneer Village',
+    'Purok Purok Pine Tree',
+    'Purok Sampaguita',
+    'Purok San Antonio',
+    'Purok Sandawa',
+    'Purok San Jose',
+    'PurokSan Lorenzo',
+    'Purok San Miguel Lower and Upper',
+    'Purok San Nicolas',
+    'Purok San Pedro Village',
+    'Purok San Vicente',
+    'Purok Spring Valley 1 and 2',
+    'Purok Sta. Cruz',
+    'Purok Sta. Maria',
+    'Purok Sta. Teresita',
+    'Purok Sto. Niño',
+    'Purok Sto. Rosario',
+    'Purok Sunflower',
+    'Purok Talisay',
+    'Purok Upper St. Jude',
+    'Purok Waling-waling',
+    'Purok Watusi'
+  ];
 
   DateTime selectedDateofSymptoms = DateTime.now();
+  String formattedDateOnly = '';
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDateofSymptoms,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDateofSymptoms) {
-      setState(() {
-        selectedDateofSymptoms = picked;
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    // Set the default value for the text controller
+    _hospitalnameController.text = widget.reportedCaseData['hospital_name'];
+    valueRecovered = widget.reportedCaseData['patient_recovered'];
+    valueAdmitted = widget.reportedCaseData['patient_admitted'];
+    valueStatus = widget.reportedCaseData['status'];
   }
 
   @override
@@ -144,11 +194,34 @@ class _AdminViewReportedCasesPageState
                         obscureText: false,
                       ),
                       _gap(),
-                      InputAddressWidget(
-                        labelText: "Address",
-                        initialVal: widget.reportedCaseData['address'],
+                      InputWidget(
+                        hintText: "Address Line 1",
+                        initialVal: widget.reportedCaseData['address_line1'],
                         obscureText: false,
                         enableTextInput: false,
+                      ),
+                      _gap(),
+                      InputWidget(
+                        hintText: "Address Line 2",
+                        initialVal: widget.reportedCaseData['address_line2'],
+                        obscureText: false,
+                        enableTextInput: false,
+                      ),
+                      _gap(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 4),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            items: puroklist.map(buildMenuItem).toList(),
+                            value: widget.reportedCaseData['purok'],
+                            hint: const Text('Purok'),
+                            onChanged: null,
+                          ),
+                        ),
                       ),
                       _gap(),
                       Padding(
@@ -348,11 +421,19 @@ class _AdminViewReportedCasesPageState
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 items: status.map(buildMenuItemStatus).toList(),
-                                value: valueStatus,
+                                value: valueStatus ??
+                                    widget.reportedCaseData['status'],
                                 hint: Text(widget.reportedCaseData['status'] ??
                                     valueStatus),
-                                onChanged: (value) =>
-                                    setState(() => valueStatus = value),
+                                onChanged: (value) {
+                                  setState(() {
+                                    // Update valueAdmitted only if the user selects a new value
+                                    valueStatus = value;
+                                  });
+
+                                  // print it to the console
+                                  print("Selected value: $value");
+                                },
                               ),
                             ),
                           ),
@@ -374,8 +455,7 @@ class _AdminViewReportedCasesPageState
                                 const SizedBox(width: 16),
                                 Text(widget.reportedCaseData[
                                         'first_symptom_date'] ??
-                                    "${selectedDateofSymptoms.toLocal()}"
-                                        .split(' ')[0]),
+                                    formattedDateOnly),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -383,7 +463,25 @@ class _AdminViewReportedCasesPageState
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 ElevatedButton(
-                                  onPressed: () => _selectDate(context),
+                                  onPressed: () async {
+                                    DateTime? picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: selectedDateofSymptoms,
+                                        firstDate: DateTime(2015, 8),
+                                        lastDate: DateTime(2101));
+                                    if (picked != null &&
+                                        picked != selectedDateofSymptoms) {
+                                      setState(() {
+                                        selectedDateofSymptoms = picked;
+                                        formattedDateOnly =
+                                            "${selectedDateofSymptoms.year}-${selectedDateofSymptoms.month.toString().padLeft(2, '0')}-${selectedDateofSymptoms.day.toString().padLeft(2, '0')}";
+                                        print(formattedDateOnly);
+                                        widget.reportedCaseData[
+                                                'first_symptom_date'] =
+                                            formattedDateOnly;
+                                      });
+                                    }
+                                  },
                                   child: const Text('Select date'),
                                 ),
                               ],
@@ -416,12 +514,21 @@ class _AdminViewReportedCasesPageState
                                       items: admitted
                                           .map(buildMenuItemAdmitted)
                                           .toList(),
-                                      value: valueAdmitted,
+                                      value: valueAdmitted ??
+                                          widget.reportedCaseData[
+                                              'patient_admitted'],
                                       hint: Text(widget.reportedCaseData[
                                               'patient_admitted'] ??
                                           valueAdmitted),
-                                      onChanged: (value) =>
-                                          setState(() => valueAdmitted = value),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          // Update valueAdmitted only if the user selects a new value
+                                          valueAdmitted = value;
+                                        });
+
+                                        // print it to the console
+                                        print("Selected value: $value");
+                                      },
                                     ),
                                   ),
                                 ),
@@ -468,12 +575,21 @@ class _AdminViewReportedCasesPageState
                                 items: recovered
                                     .map(buildMenuItemRecovered)
                                     .toList(),
-                                value: valueRecovered,
+                                value: valueRecovered ??
+                                    widget
+                                        .reportedCaseData['patient_recovered'],
                                 hint: Text(widget.reportedCaseData[
                                         'patient_recovered'] ??
                                     valueRecovered),
-                                onChanged: (value) =>
-                                    setState(() => valueRecovered = value),
+                                onChanged: (value) {
+                                  setState(() {
+                                    // Update valueAdmitted only if the user selects a new value
+                                    valueRecovered = value;
+                                  });
+
+                                  // print it to the console
+                                  print("Selected value: $value");
+                                },
                               ),
                             ),
                           ),
@@ -549,12 +665,7 @@ class _AdminViewReportedCasesPageState
         reports.doc(documentID); // Use the document_id here
 
     _buildProgressIndicator();
-    // Get the current date
-    DateTime currentDate = DateTime.now();
-
-    // Format the date as a string in "YYYY-MM-DD" format
-    String formattedDateOnly =
-        "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
+    // // Get the current date
 
     Map<String, dynamic> updateData = {
       'status': valueStatus,
