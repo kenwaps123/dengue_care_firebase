@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,21 @@ class testChart extends StatefulWidget {
 }
 
 class _testChartState extends State<testChart> {
+  void showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Clearing Data...'),
+        content: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  void dismissLoadingDialog() {
+    Navigator.of(context).pop();
+  }
+
   @override
   void initState() {
     selectedYear = selectedYear;
@@ -80,12 +96,12 @@ class _testChartState extends State<testChart> {
           chart3.sort((a, b) => a.x.compareTo(b.x));
           barChart.sort((a, b) => a.cases.compareTo(b.cases));
           listYear.sort((a, b) => a.compareTo(b));
-          minYear = listYear.first - 1;
-          maxYear = listYear.last + 1;
           a1 = pieChart[pieChart.length - 4].number;
           a2 = pieChart[pieChart.length - 3].number;
           a3 = pieChart[pieChart.length - 2].number;
           a4 = pieChart[pieChart.length - 1].number;
+          minYear = listYear.first - 1;
+          maxYear = listYear.last + 1;
         } else {}
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Display a circular progress indicator while waiting for data.
@@ -119,7 +135,7 @@ class _testChartState extends State<testChart> {
                         child: Text(year.toString()),
                       );
                     }).toList(),
-                    onChanged: (newValue) {
+                    onChanged: (newValue) async {
                       setState(() {
                         selectedYear = newValue!;
 
@@ -135,7 +151,6 @@ class _testChartState extends State<testChart> {
                           queryAgeGroupsCount(selectedYear).then((result) {
                             pieChart = result;
                           });
-
                           getPurokCases(selectedYear).then((result) {
                             barChart = result;
                           });
@@ -150,8 +165,22 @@ class _testChartState extends State<testChart> {
                       padding: const EdgeInsets.all(16.0),
                       textStyle: const TextStyle(fontSize: 20),
                     ),
-                    onPressed: () =>
-                        deleteAllDocumentsInCollection('denguelinelist'),
+                    onPressed: () async {
+                      setState(() {
+                        chart = [];
+                        chart2 = [];
+                        chart3 = [];
+                        barChart = [];
+                        pieChart = [];
+                        a1 = 0;
+                        a2 = 0;
+                        a3 = 0;
+                        a4 = 0;
+                      });
+                      showLoadingDialog();
+                      await deleteAllDocumentsInCollection('denguelinelist');
+                      dismissLoadingDialog();
+                    },
                     child: const Text('Clear Data'),
                   ),
                 ],
@@ -301,8 +330,7 @@ class _testChartState extends State<testChart> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Flexible(
-                      flex: 1,
+                    Expanded(
                       child: SfCircularChart(
                         title: ChartTitle(text: 'Active Cases Age Group'),
                         series: <CircularSeries>[
@@ -323,8 +351,7 @@ class _testChartState extends State<testChart> {
                         ],
                       ),
                     ),
-                    Flexible(
-                      flex: 2,
+                    Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,7 +382,7 @@ class _testChartState extends State<testChart> {
                     ],
                   ),
                   width: double.infinity,
-                  child: Flexible(
+                  child: Expanded(
                     child: Column(
                       children: [
                         SizedBox(
@@ -451,9 +478,7 @@ Future<List<piechartData>> queryAgeGroupsCount(int year) async {
     ageGroupCount4 = querySnapshot4.size.toDouble();
     pieChart.add(piechartData('Old Adult', ageGroupCount4, Colors.yellow));
 
-    return Future.delayed(const Duration(seconds: 1), () {
-      return pieChart;
-    });
+    return pieChart;
   } catch (e) {
     return Future.value([]);
   }
@@ -467,23 +492,18 @@ Future<List<int>> getListYear() async {
     QuerySnapshot querySnapshot =
         await firestore.collection('denguelinelist').get();
 
-    Set<dynamic> uniqueValues = {};
+    Set<int> uniqueValues = {};
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       var data = doc.data() as Map<String, dynamic>;
       if (data.containsKey(x)) {
         uniqueValues.add(data[x]);
       }
     }
-
-    if (listYear.isEmpty) {
-      for (var year in uniqueValues) {
-        listYear.add(year);
-      }
-    }
+    listYear = uniqueValues.toList();
 
     return listYear;
   } catch (e) {
-    print('Empty ListYear');
+    print('Error: ${e}');
     return Future.value([]);
   }
 }
@@ -614,6 +634,7 @@ Future<List<StreetPurokData>> getPurokCases(int year) async {
 }
 
 Future<void> deleteAllDocumentsInCollection(String collectionPath) async {
+  User? user = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   try {
@@ -624,15 +645,37 @@ Future<void> deleteAllDocumentsInCollection(String collectionPath) async {
     for (final document in documents) {
       await document.reference.delete();
     }
-    a1 = 0;
-    a2 = 0;
-    a3 = 0;
-    a4 = 0;
+    logAdminAction('Clear Data', user!.uid);
     print(
         'All documents in the collection "$collectionPath" have been deleted.');
   } catch (e) {
     print('Error deleting documents: $e');
   }
+}
+
+void logAdminAction(String action, String documentId) async {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final user = auth.currentUser;
+
+  CollectionReference adminLogs =
+      FirebaseFirestore.instance.collection('admin_logs');
+
+  // Get the current date and time
+  DateTime currentDateTime = DateTime.now();
+
+  // Format the date and time as a string
+  String formattedDateTime = "${currentDateTime.toLocal()}";
+
+  // Create a log entry
+  Map<String, dynamic> logEntry = {
+    'admin_email': user?.email,
+    'action': action,
+    'document_id': documentId,
+    'timestamp': formattedDateTime,
+  };
+
+  // Add the log entry to the 'admin_logs' collection
+  await adminLogs.add(logEntry);
 }
 
 Widget _gap() => const SizedBox(height: 8);

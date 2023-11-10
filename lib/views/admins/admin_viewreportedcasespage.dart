@@ -569,12 +569,38 @@ class _AdminViewReportedCasesPageState
         _isSubmitting = false; // end submission
       });
       _showSnackbarSuccess(context, 'Success');
+      logAdminAction('Edit Dengue Case Report Form', documentID);
     }).catchError((error) {
       setState(() {
         _isSubmitting = false; // end submission
       });
       _showSnackbarError(context, error.toString());
     });
+  }
+
+  void logAdminAction(String action, String documentId) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+
+    CollectionReference adminLogs =
+        FirebaseFirestore.instance.collection('admin_logs');
+
+    // Get the current date and time
+    DateTime currentDateTime = DateTime.now();
+
+    // Format the date and time as a string
+    String formattedDateTime = "${currentDateTime.toLocal()}";
+
+    // Create a log entry
+    Map<String, dynamic> logEntry = {
+      'admin_email': user?.email,
+      'action': action,
+      'document_id': documentId,
+      'timestamp': formattedDateTime,
+    };
+
+    // Add the log entry to the 'admin_logs' collection
+    await adminLogs.add(logEntry);
   }
 }
 
