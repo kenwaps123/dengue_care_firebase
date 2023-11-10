@@ -40,6 +40,65 @@ class _AdminViewReportedCasesPageState
   final admitted = ["Yes", "No"];
   String? valueRecovered;
   final recovered = ["Yes", "No"];
+  String? purokvalue;
+  final puroklist = <String>[
+    'Bread Village',
+    'Carnation St.',
+    'Hillside Sibdivision',
+    'Ladislawa Village',
+    'NCCC Village',
+    'NHA Buhangin',
+    'Purok Anahaw',
+    'Purok Apollo',
+    'Purok Bagong Lipunan',
+    'Purok Balite 1 and 2',
+    'Purok Birsaba',
+    'Purok Blk. 2',
+    'Purok Blk. 10',
+    'Purok Buhangin Hills',
+    'Purok Cubcub',
+    'Purok Damayan',
+    'Purok Dumanlas Proper',
+    'Purok Engan Village',
+    'Purok Kalayaan',
+    'Purok Lopzcom',
+    'Purok Lourdes',
+    'Purok Lower St Jude',
+    'Purok Maglana',
+    'Purok Mahayag',
+    'Purok Margarita',
+    'Purok Medalla Melagrosa',
+    'Purok Molave',
+    'Purok Mt. Carmel',
+    'Purok New San Isidro',
+    'Purok NIC',
+    'Purok Old San Isidro',
+    'Purok Orchids',
+    'Purok Palm Drive',
+    'Purok Panorama Village',
+    'Purok Pioneer Village',
+    'Purok Purok Pine Tree',
+    'Purok Sampaguita',
+    'Purok San Antonio',
+    'Purok Sandawa',
+    'Purok San Jose',
+    'PurokSan Lorenzo',
+    'Purok San Miguel Lower and Upper',
+    'Purok San Nicolas',
+    'Purok San Pedro Village',
+    'Purok San Vicente',
+    'Purok Spring Valley 1 and 2',
+    'Purok Sta. Cruz',
+    'Purok Sta. Maria',
+    'Purok Sta. Teresita',
+    'Purok Sto. Niño',
+    'Purok Sto. Rosario',
+    'Purok Sunflower',
+    'Purok Talisay',
+    'Purok Upper St. Jude',
+    'Purok Waling-waling',
+    'Purok Watusi'
+  ];
 
   DateTime selectedDateofSymptoms = DateTime.now();
   String formattedDateOnly = '';
@@ -135,11 +194,34 @@ class _AdminViewReportedCasesPageState
                         obscureText: false,
                       ),
                       _gap(),
-                      InputAddressWidget(
-                        labelText: "Address",
-                        initialVal: widget.reportedCaseData['address'],
+                      InputWidget(
+                        hintText: "Address Line 1",
+                        initialVal: widget.reportedCaseData['address_line1'],
                         obscureText: false,
                         enableTextInput: false,
+                      ),
+                      _gap(),
+                      InputWidget(
+                        hintText: "Address Line 2",
+                        initialVal: widget.reportedCaseData['address_line2'],
+                        obscureText: false,
+                        enableTextInput: false,
+                      ),
+                      _gap(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 4),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            items: puroklist.map(buildMenuItem).toList(),
+                            value: widget.reportedCaseData['purok'],
+                            hint: const Text('Purok'),
+                            onChanged: null,
+                          ),
+                        ),
                       ),
                       _gap(),
                       Padding(

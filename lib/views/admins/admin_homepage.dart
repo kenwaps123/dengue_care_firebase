@@ -623,7 +623,7 @@ class LengthIndicator extends StatelessWidget {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('reports')
-          .where('Check', isEqualTo: 'No')
+          .where('checked', isEqualTo: 'No')
           .orderBy('date', descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
