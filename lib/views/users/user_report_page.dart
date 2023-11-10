@@ -4,11 +4,9 @@ import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uuid/uuid.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_widget.dart';
-import 'package:denguecare_firebase/lists/puroklist.dart';
 
 class UserReportPage extends StatefulWidget {
   const UserReportPage({super.key});
@@ -18,20 +16,6 @@ class UserReportPage extends StatefulWidget {
 }
 
 class _UserReportPageState extends State<UserReportPage> {
-  final uuid = const Uuid();
-  String uniqueId = '';
-  @override
-  void initState() {
-    super.initState();
-    generateUniqueId();
-  }
-
-  void generateUniqueId() {
-    setState(() {
-      uniqueId = uuid.v4(); // Generates a new unique ID
-    });
-  }
-
   bool _isSubmitting = false;
   Widget _buildProgressIndicator() {
     if (_isSubmitting) {
@@ -43,14 +27,13 @@ class _UserReportPageState extends State<UserReportPage> {
     }
   }
 
-  final _purokList = PurokList();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _contactnumberController =
       TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _doornumController = TextEditingController();
-  final TextEditingController _streetController = TextEditingController();
+  final TextEditingController _addressLine1Controller = TextEditingController();
+  final TextEditingController _addressLine2Controller = TextEditingController();
 
   bool _headache = false;
   bool _bodymalaise = false;
@@ -72,7 +55,7 @@ class _UserReportPageState extends State<UserReportPage> {
     'Carnation St.',
     'Hillside Sibdivision',
     'Ladislawa Village',
-    'Nccc Village',
+    'NCCC Village',
     'NHA Buhangin',
     'Purok Anahaw',
     'Purok Apollo',
@@ -212,7 +195,7 @@ class _UserReportPageState extends State<UserReportPage> {
                       ),
                       InputWidget(
                         hintText: "Address Line 1",
-                        controller: _doornumController,
+                        controller: _addressLine1Controller,
                         obscureText: false,
                       ),
                       _gap(),
@@ -221,24 +204,28 @@ class _UserReportPageState extends State<UserReportPage> {
                           Expanded(
                             child: InputWidget(
                               hintText: "Address Line 2",
-                              controller: _streetController,
+                              controller: _addressLine2Controller,
                               obscureText: false,
                             ),
                           ),
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8.0)),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  items: puroklist.map(buildMenuItem).toList(),
-                                  value: purokvalue,
-                                  hint: const Text('Purok'),
-                                  onChanged: (val) =>
-                                      setState(() => purokvalue = val),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 4),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    items:
+                                        puroklist.map(buildMenuItem).toList(),
+                                    value: purokvalue,
+                                    hint: const Text('Purok'),
+                                    onChanged: (val) =>
+                                        setState(() => purokvalue = val),
+                                  ),
                                 ),
                               ),
                             ),
@@ -509,7 +496,9 @@ class _UserReportPageState extends State<UserReportPage> {
         'age': _ageController.text,
         'sex': value,
         'contact_number': _contactnumberController.text,
-        'address': _addressController.text,
+        'address_line1': _addressLine1Controller.text,
+        'address_line2': _addressLine2Controller.text,
+        'purok': purokvalue,
         'headache': _headache,
         'body_malaise': _bodymalaise,
         'myalgia': _myalgia,
@@ -525,11 +514,10 @@ class _UserReportPageState extends State<UserReportPage> {
         'date': FieldValue.serverTimestamp(),
         'emailid': user!.email!,
         'status': 'Suspected',
-        'date_of_first_symptom': '',
+        'first_symptom_date': '',
         'patient_admitted': 'No',
         'hospital_name': ' ',
         'patient_recovered': 'No',
-        'document_id': uniqueId,
         'checked': 'No',
         // Add other fields as necessary
       });
@@ -563,8 +551,9 @@ class _UserReportPageState extends State<UserReportPage> {
       _nameController.clear();
       _ageController.clear();
       _addressController.clear();
+      _addressLine1Controller.clear();
+      _addressLine2Controller.clear();
       _contactnumberController.clear();
-      _addressController.clear();
       value = 'Male';
       _headache = false;
       _bodymalaise = false;

@@ -38,7 +38,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
             DateTime dateTime = (data['date'] as Timestamp).toDate();
 
             // Format the DateTime to display only the date
-            String formattedDate = DateFormat('MM/d').format(dateTime);
+            String formattedDate = DateFormat('MM/d/yyyy').format(dateTime);
 
             return Container(
               width: 50,
@@ -101,10 +101,6 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                               reportedCaseData: data));
                         },
                         icon: const Icon(Icons.edit_note_rounded),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.check_rounded),
                       ),
                     ],
                   ),

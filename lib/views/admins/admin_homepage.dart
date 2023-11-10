@@ -623,6 +623,7 @@ class LengthIndicator extends StatelessWidget {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('reports')
+          .where('Check', isEqualTo: 'No')
           .orderBy('date', descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -633,7 +634,8 @@ class LengthIndicator extends StatelessWidget {
             style: GoogleFonts.poppins(color: Colors.white, fontSize: 12),
           );
         }
-        return const Text('Loading...');
+        return Text('0',
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12));
       },
     );
   }
