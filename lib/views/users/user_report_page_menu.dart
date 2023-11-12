@@ -1,4 +1,5 @@
 import 'package:denguecare_firebase/views/users/user_report_page.dart';
+import 'package:denguecare_firebase/views/users/user_historyreports.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,7 +41,9 @@ class _UserReportPageMenuState extends State<UserReportPageMenu> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4)),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Get.to(() => const ReportsHistory());
+              },
               child: const Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Text(
