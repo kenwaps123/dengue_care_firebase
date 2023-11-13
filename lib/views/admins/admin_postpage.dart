@@ -1,21 +1,28 @@
 import 'dart:io';
-
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'admin_homepage.dart';
 
 String imageUrl = '';
 String userName = '';
+String selectedFile = '';
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _contentController = TextEditingController();
 File? _selectedImage;
 File? image;
+List<Uint8List> pickedImagesInBytes = [];
+
+Uint8List convertListToUint8List(List<int> list) {
+  return Uint8List.fromList(list);
+}
 
 class AdminPostPage extends StatefulWidget {
   const AdminPostPage({super.key});
@@ -52,12 +59,19 @@ class _AdminPostPageState extends State<AdminPostPage> {
               child: Column(
                 children: [
                   _selectedImage != null
-                      ? Image.file(
-                          _selectedImage!,
-                          width: 350,
-                          height: 350,
-                          fit: BoxFit.cover,
-                        )
+                      ? kIsWeb
+                          ? Image.file(
+                              _selectedImage!,
+                              width: 350,
+                              height: 350,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              _selectedImage!,
+                              width: 350,
+                              height: 350,
+                              fit: BoxFit.cover,
+                            )
                       : const Placeholder(
                           fallbackHeight: 300,
                           fallbackWidth: 300,
@@ -91,7 +105,11 @@ class _AdminPostPageState extends State<AdminPostPage> {
                               icon: const Icon(
                                   Icons.add_photo_alternate_outlined),
                               onPressed: () {
-                                imgPickUpload();
+                                if (kIsWeb) {
+                                  _pickImageWeb();
+                                } else if (Platform.isAndroid) {
+                                  imgPickUpload();
+                                }
                               },
                               label: const Text('Upload an image'),
                             ),
@@ -117,6 +135,42 @@ class _AdminPostPageState extends State<AdminPostPage> {
       _selectedImage = null;
       imageUrl = '';
     });
+  }
+
+  Future<File> _convertBytesToFile(Uint8List bytes, String fileName) async {
+    String tempDir = (await getTemporaryDirectory()).path;
+    File file = File('$tempDir/$fileName');
+    await file.writeAsBytes(bytes);
+    return file;
+  }
+
+  Future<void> _pickImageWeb() async {
+    FilePickerResult? filePickerResult = await FilePicker.platform
+        .pickFiles(type: FileType.image, allowMultiple: false);
+
+    try {
+      if (filePickerResult != null && filePickerResult.files.isNotEmpty) {
+        Uint8List? imageBytes = filePickerResult.files.first.bytes;
+        if (imageBytes != null) {
+          // Convert Uint8List to File
+          File imageFile = await _convertBytesToFile(imageBytes, 'image.jpg');
+
+          // Use the imageFile as needed
+          setState(() {
+            _selectedImage = imageFile;
+          });
+        }
+
+        for (var element in filePickerResult.files) {
+          setState(() {
+            pickedImagesInBytes.add(element.bytes!);
+          });
+        }
+      }
+    } catch (e) {
+      _showSnackbarError(context, e.toString());
+      print(e.toString());
+    }
   }
 
   void imgPickUpload() async {

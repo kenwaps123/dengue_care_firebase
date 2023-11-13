@@ -1,9 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 final PanelController _panelController = PanelController();
 final mapController = MapController();
@@ -135,4 +135,33 @@ Widget _floatingPanel() {
       ),
     ),
   );
+}
+
+class DataFromFirebase extends StatelessWidget {
+  const DataFromFirebase({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('reports').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> dataForMap =
+                snapshot.data!.docs[index].data() as Map<String, dynamic>;
+            return null;
+          },
+        );
+      },
+    );
+  }
 }
