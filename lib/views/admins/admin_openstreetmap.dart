@@ -104,7 +104,7 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
         body: FlutterMap(
           mapController: mapController,
           options: const MapOptions(
-            initialCenter: LatLng(7.113932, 125.624737),
+            initialCenter: LatLng(7.1090628857797755, 125.61323257408277),
             initialZoom: 15.0,
             maxZoom: 18.0,
             minZoom: 5.0,
