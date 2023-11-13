@@ -30,6 +30,7 @@ class InputAgeWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
         enabled: enableTextInput,
+
         initialValue: initialVal,
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -41,6 +42,7 @@ class InputAgeWidget extends StatelessWidget {
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(
               RegExp(r'[0-9]')), // Only allow digits and decimal point
+          LengthLimitingTextInputFormatter(2)
         ],
         controller: controller,
         decoration: InputDecoration(

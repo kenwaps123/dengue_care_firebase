@@ -31,9 +31,10 @@ class InputContactNumber extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextFormField(
         inputFormatters: [
-          LengthLimitingTextInputFormatter(10),
+          //LengthLimitingTextInputFormatter(10),
           FilteringTextInputFormatter.digitsOnly,
         ],
+        maxLength: 10,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'This field is required';

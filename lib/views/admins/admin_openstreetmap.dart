@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/views/admins/admin_dataviz.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
@@ -16,20 +17,66 @@ class AdminOpenStreetMap extends StatefulWidget {
 }
 
 class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
-  final List<LatLng> points = [
-    const LatLng(7.113932, 125.624737),
-    const LatLng(7.11310, 125.624430),
-    const LatLng(7.1200, 125.624737),
-  ];
+  late Map<String, LatLng> purokList = {};
+  int purokCounter = 0;
 
-  void _showDialog(BuildContext context, LatLng point) {
+  @override
+  void initState() {
+    super.initState();
+    // mapController = MapController();
+    fetchData();
+  }
+
+  // final List<LatLng> points = [
+  //   const LatLng(7.113932, 125.624737),
+  //   const LatLng(7.11310, 125.624430),
+  //   const LatLng(7.1200, 125.624737),
+  // ];
+
+  Future<void> fetchData() async {
+    try {
+      PurokData result = await fetchPurokData();
+      Map<String, LatLng> dataMap = result.data;
+      int uniquePurokCount = result.uniquePurokCount;
+      setState(() {
+        purokList = dataMap;
+        purokCounter = uniquePurokCount;
+      });
+
+      // Now you can use dataMap and uniquePurokCount as needed
+      print('Data Map: $dataMap');
+      print('Unique Purok Count: $uniquePurokCount');
+    } catch (e) {
+      // Handle errors
+      print('Error fetching data: $e');
+    }
+  }
+
+  void _showDialog(BuildContext context, LatLng point, String purokName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Point Details'),
-          content: Text(
-              'Latitude: ${point.latitude}, Longitude: ${point.longitude}'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Coordinate Count: $purokCounter ',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Purok: $purokName ',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Latitude: ${point.latitude}, Longitude: ${point.longitude}',
+              ),
+            ],
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text('Close'),
@@ -67,18 +114,18 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
               urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
             ),
             MarkerLayer(
-              markers: points.map((point) {
+              markers: purokList.entries.map((entry) {
                 return Marker(
                   child: GestureDetector(
-                    onTap: () => _showDialog(context, point),
+                    onTap: () => _showDialog(context, entry.value, entry.key),
                     child: Icon(
                       Icons.circle,
-                      color: Colors.red[300],
+                      color: Colors.red[400],
                     ),
                   ),
                   width: 30.0,
                   height: 30.0,
-                  point: point,
+                  point: entry.value,
                 );
               }).toList(),
             )
@@ -137,31 +184,36 @@ Widget _floatingPanel() {
   );
 }
 
-class DataFromFirebase extends StatelessWidget {
-  const DataFromFirebase({super.key});
+Future<PurokData> fetchPurokData() async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await FirebaseFirestore.instance.collection('reports').get();
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('reports').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
+    Map<String, LatLng> dataMap = {};
+    Set<String> uniquePuroks = {};
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    for (var document in querySnapshot.docs) {
+      final purok = document['purok'];
+      final latitude = document['latitude'];
+      final longitude = document['longitude'];
+      final coordinates = LatLng(latitude, longitude);
 
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            Map<String, dynamic> dataForMap =
-                snapshot.data!.docs[index].data() as Map<String, dynamic>;
-            return null;
-          },
-        );
-      },
-    );
+      dataMap[purok] = coordinates;
+      uniquePuroks.add(purok);
+    }
+
+    int uniquePurokCount = uniquePuroks.length;
+
+    return PurokData(dataMap, uniquePurokCount);
+  } catch (e) {
+    print('Error fetching data: $e');
+    rethrow; // You might want to handle errors differently based on your use case
   }
+}
+
+class PurokData {
+  final Map<String, LatLng> data;
+  final int uniquePurokCount;
+
+  PurokData(this.data, this.uniquePurokCount);
 }

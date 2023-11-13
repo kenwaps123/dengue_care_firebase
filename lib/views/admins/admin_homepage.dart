@@ -620,6 +620,7 @@ class LengthIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Access the length of the ListView
+    int length = 0;
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('reports')
@@ -628,13 +629,14 @@ class LengthIndicator extends StatelessWidget {
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasData) {
-          int length = snapshot.data!.docs.length;
+          length = snapshot.data!.docs.length;
+          print(length);
           return Text(
             '$length',
             style: GoogleFonts.poppins(color: Colors.white, fontSize: 12),
           );
         }
-        return Text('0',
+        return Text('$length',
             style: GoogleFonts.poppins(color: Colors.white, fontSize: 12));
       },
     );

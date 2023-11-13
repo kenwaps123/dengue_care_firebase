@@ -4,6 +4,7 @@ import 'package:denguecare_firebase/views/widgets/input_contact_number.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_widget.dart';
@@ -25,6 +26,13 @@ class _UserReportPageState extends State<UserReportPage> {
     } else {
       return Container(); // Return an empty container if _isSubmitting is false
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the default value for the text controller
+    purokvalue = 'Select Purok';
   }
 
   final TextEditingController _nameController = TextEditingController();
@@ -50,64 +58,73 @@ class _UserReportPageState extends State<UserReportPage> {
   String? value;
   String? purokvalue;
   final sex = ['Male', 'Female'];
-  final puroklist = <String>[
-    'Bread Village',
-    'Carnation St.',
-    'Hillside Sibdivision',
-    'Ladislawa Village',
-    'NCCC Village',
-    'NHA Buhangin',
-    'Purok Anahaw',
-    'Purok Apollo',
-    'Purok Bagong Lipunan',
-    'Purok Balite 1 and 2',
-    'Purok Birsaba',
-    'Purok Blk. 2',
-    'Purok Blk. 10',
-    'Purok Buhangin Hills',
-    'Purok Cubcub',
-    'Purok Damayan',
-    'Purok Dumanlas Proper',
-    'Purok Engan Village',
-    'Purok Kalayaan',
-    'Purok Lopzcom',
-    'Purok Lourdes',
-    'Purok Lower St Jude',
-    'Purok Maglana',
-    'Purok Mahayag',
-    'Purok Margarita',
-    'Purok Medalla Melagrosa',
-    'Purok Molave',
-    'Purok Mt. Carmel',
-    'Purok New San Isidro',
-    'Purok NIC',
-    'Purok Old San Isidro',
-    'Purok Orchids',
-    'Purok Palm Drive',
-    'Purok Panorama Village',
-    'Purok Pioneer Village',
-    'Purok Purok Pine Tree',
-    'Purok Sampaguita',
-    'Purok San Antonio',
-    'Purok Sandawa',
-    'Purok San Jose',
-    'PurokSan Lorenzo',
-    'Purok San Miguel Lower and Upper',
-    'Purok San Nicolas',
-    'Purok San Pedro Village',
-    'Purok San Vicente',
-    'Purok Spring Valley 1 and 2',
-    'Purok Sta. Cruz',
-    'Purok Sta. Maria',
-    'Purok Sta. Teresita',
-    'Purok Sto. Niño',
-    'Purok Sto. Rosario',
-    'Purok Sunflower',
-    'Purok Talisay',
-    'Purok Upper St. Jude',
-    'Purok Waling-waling',
-    'Purok Watusi'
-  ];
+  final puroklist = <String, LatLng>{
+    'Select Purok': const LatLng(0.0, 0.0),
+    'Bread Village': const LatLng(7.114766536403886, 125.60696940052657),
+    'Carnation St.': const LatLng(7.10508641333724, 125.61515746758455),
+    'Hillside Sibdivision': const LatLng(7.108102285076556, 125.62406250246629),
+    'Ladislawa Village': const LatLng(7.098200119201119, 125.61019426301475),
+    'NCCC Village': const LatLng(7.096960557359798, 125.61275624974145),
+    'NHA Buhangin': const LatLng(7.113905613264349, 125.62504342908515),
+    'Purok Anahaw': const LatLng(7.109096059265925, 125.61964421925765),
+    'Purok Apollo': const LatLng(7.107768956186394, 125.61416454760068),
+    'Purok Bagong Lipunan': const LatLng(7.095857531140644, 125.61095333058628),
+    'Purok Balite 1 and 2': const LatLng(7.119549280388477, 125.60805092125558),
+    'Purok Birsaba': const LatLng(7.105061321316023, 125.61969713317032),
+    // 'Purok Blk. 2': const LatLng(7.114766536403886, 125.60696940052657),
+    'Purok Blk. 10': const LatLng(7.108181645444775, 125.62655502248933),
+    'Purok Buhangin Hills': const LatLng(7.117113700249076, 125.60809919264209),
+    'Purok Cubcub': const LatLng(7.116119305511145, 125.6141471539433),
+    'Purok Damayan': const LatLng(7.116054904638758, 125.61541329783626),
+    'Purok Dumanlas Proper':
+        const LatLng(7.106273586217053, 125.62089114209782),
+    'Purok Engan Village': const LatLng(7.118753809802358, 125.60452647717479),
+    'Purok Kalayaan': const LatLng(7.1032977897030545, 125.62238184200663),
+    'Purok Lopzcom': const LatLng(7.105594927870564, 125.60341410176332),
+    'Purok Lourdes': const LatLng(7.105715353615316, 125.62532253389722),
+    'Purok Lower St Jude': const LatLng(7.114410259476265, 125.61541606253824),
+    'Purok Maglana': const LatLng(7.104095409160874, 125.6102089025267),
+    'Purok Mahayag': const LatLng(7.111363688338518, 125.62058462285405),
+    'Purok Margarita': const LatLng(7.108554977313653, 125.62107532100138),
+    'Purok Medalla Melagrosa':
+        const LatLng(7.112585632970439, 125.61933725203026),
+    'Purok Molave': const LatLng(7.1102453162628745, 125.61514560550482),
+    'Purok Mt. Carmel': const LatLng(7.107832093153038, 125.62042899888917),
+    'Purok New San Isidro': const LatLng(7.114646894156096, 125.62149873266685),
+    'Purok NIC': const LatLng(7.1056606477663, 125.61569942888742),
+    'Purok Old San Isidro': const LatLng(7.113866298326243, 125.62157743217746),
+    'Purok Orchids': const LatLng(7.113904106560612, 125.61480764168593),
+    'Purok Palm Drive': const LatLng(7.099059763574843, 125.61713711812722),
+    'Purok Panorama Village':
+        const LatLng(7.1120899631907895, 125.60397931051439),
+    'Purok Pioneer Village':
+        const LatLng(7.112689498658063, 125.60951878984032),
+    'Purok Purok Pine Tree':
+        const LatLng(7.112869971081789, 125.61574491979016),
+    'Purok Sampaguita': const LatLng(7.106326631239756, 125.61449205861119),
+    'Purok San Antonio': const LatLng(7.113792622959072, 125.6226665585437),
+    'Purok Sandawa': const LatLng(7.104890601658813, 125.60990281312078),
+    'Purok San Jose': const LatLng(7.116417507324833, 125.6194716967905),
+    'Purok San Lorenzo': const LatLng(7.1142672, 125.6176972),
+    'Purok San Miguel Lower and Upper':
+        const LatLng(7.102392757056179, 125.61924295918227),
+    'Purok San Nicolas': const LatLng(7.11144062162212, 125.61787758846674),
+    'Purok San Pedro Village':
+        const LatLng(7.099771300160193, 125.61313186589621),
+    'Purok San Vicente': const LatLng(7.110561784251983, 125.62277836600413),
+    'Purok Spring Valley 1 and 2':
+        const LatLng(7.103488383914926, 125.60890080560779),
+    'Purok Sta. Cruz': const LatLng(7.113860769421073, 125.62500720591544),
+    'Purok Sta. Maria': const LatLng(7.103812074866343, 125.62119095608588),
+    'Purok Sta. Teresita': const LatLng(7.110141276760571, 125.61893022718402),
+    'Purok Sto. Niño': const LatLng(7.107110521047068, 125.61729906299115),
+    'Purok Sto. Rosario': const LatLng(7.100879717554058, 125.61703643376391),
+    'Purok Sunflower': const LatLng(7.101395920309526, 125.61513843282769),
+    'Purok Talisay': const LatLng(7.110000319864266, 125.62038233087334),
+    'Purok Upper St. Jude': const LatLng(7.114751305745676, 125.6171331261847),
+    'Purok Waling-waling': const LatLng(7.110545022083019, 125.6174721171983),
+    'Purok Watusi': const LatLng(7.102191824458489, 125.61687297676335),
+  };
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -219,10 +236,13 @@ class _UserReportPageState extends State<UserReportPage> {
                                     borderRadius: BorderRadius.circular(8.0)),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
-                                    items:
-                                        puroklist.map(buildMenuItem).toList(),
+                                    items: puroklist.keys.map((String purok) {
+                                      return DropdownMenuItem<String>(
+                                        value: purok,
+                                        child: Text(purok),
+                                      );
+                                    }).toList(),
                                     value: purokvalue,
-                                    hint: const Text('Purok'),
                                     onChanged: (val) =>
                                         setState(() => purokvalue = val),
                                   ),
@@ -490,7 +510,11 @@ class _UserReportPageState extends State<UserReportPage> {
     try {
       CollectionReference reports =
           FirebaseFirestore.instance.collection('reports');
+
+      String? selectedPurok = purokvalue;
       const CircularProgressIndicator();
+      LatLng selectedLatLng =
+          puroklist[selectedPurok] ?? const LatLng(0.0, 0.0);
       await reports.add({
         'name': _nameController.text,
         'age': _ageController.text,
@@ -519,6 +543,8 @@ class _UserReportPageState extends State<UserReportPage> {
         'hospital_name': ' ',
         'patient_recovered': 'No',
         'checked': 'No',
+        'longitude': selectedLatLng.longitude,
+        'latitude': selectedLatLng.latitude,
         // Add other fields as necessary
       });
     } catch (e) {
@@ -554,6 +580,7 @@ class _UserReportPageState extends State<UserReportPage> {
       _addressLine1Controller.clear();
       _addressLine2Controller.clear();
       _contactnumberController.clear();
+      purokvalue = 'Select Purok';
       value = 'Male';
       _headache = false;
       _bodymalaise = false;
