@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/views/admins/admin_dataviz.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -19,12 +19,15 @@ class AdminOpenStreetMap extends StatefulWidget {
 class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
   late Map<String, LatLng> purokList = {};
   int purokCounter = 0;
-
+  String selectPurok = '';
+  int? len;
+  final FirebaseFirestore db = FirebaseFirestore.instance;
   @override
   void initState() {
     super.initState();
-    // mapController = MapController();
+    fetchPurokData();
     fetchData();
+    //getPurokCount();
   }
 
   // final List<LatLng> points = [
@@ -32,23 +35,81 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
   //   const LatLng(7.11310, 125.624430),
   //   const LatLng(7.1200, 125.624737),
   // ];
+  Future<Map<String, LatLng>> fetchPurokData() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance.collection('reports').get();
+
+      return Map.fromEntries(querySnapshot.docs
+          .map((DocumentSnapshot<Map<String, dynamic>> document) {
+        final purok = document['purok'];
+        final latitude = document['latitude'];
+        final longitude = document['longitude'];
+        final coordinates = LatLng(latitude, longitude);
+
+        return MapEntry(purok, coordinates);
+      }));
+    } catch (e) {
+      print('Error fetching data: $e');
+      rethrow; // You might want to handle errors differently based on your use case
+    }
+  }
 
   Future<void> fetchData() async {
     try {
-      PurokData result = await fetchPurokData();
-      Map<String, LatLng> dataMap = result.data;
-      int uniquePurokCount = result.uniquePurokCount;
+      final result = await fetchPurokData();
+      Map<String, LatLng> dataMap = result;
+
       setState(() {
         purokList = dataMap;
-        purokCounter = uniquePurokCount;
       });
 
       // Now you can use dataMap and uniquePurokCount as needed
       print('Data Map: $dataMap');
-      print('Unique Purok Count: $uniquePurokCount');
+      fetchDataForSelectedPurok();
     } catch (e) {
       // Handle errors
       print('Error fetching data: $e');
+    }
+  }
+
+  Future<int> getCountForPurok(String selectedPurok) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('reports')
+              .where('purok', isEqualTo: selectedPurok)
+              .get();
+
+      int size = querySnapshot.size;
+      setState(() {
+        size = querySnapshot.size;
+        len = size;
+      });
+      return size;
+    } catch (e) {
+      // Handle any potential errors, e.g., network issues or Firestore exceptions
+      print('Error getting count: $e');
+      return -1; // Return a special value to indicate an error
+    }
+  }
+
+  Future<void> fetchDataForSelectedPurok() async {
+    // int fetchedData = await getCountForPurok(selectPurok);
+
+    // if (fetchedData != -1) {
+    //   print('Count for $selectPurok: $fetchedData');
+    // } else {
+    //   print('Error getting count for $selectPurok');
+    // }
+    for (var purok in purokList.keys) {
+      int fetchedData = await getCountForPurok(purok);
+
+      if (fetchedData != -1) {
+        print('Count for $purok: $fetchedData');
+      } else {
+        print('Error getting count for $purok');
+      }
     }
   }
 
@@ -63,7 +124,7 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Coordinate Count: $purokCounter ',
+                'Coordinate Count: $len',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
@@ -117,7 +178,15 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
               markers: purokList.entries.map((entry) {
                 return Marker(
                   child: GestureDetector(
-                    onTap: () => _showDialog(context, entry.value, entry.key),
+                    onTap: () {
+                      _showDialog(context, entry.value, entry.key);
+                      getCountForPurok(entry.key);
+                      // print('len $len');
+                      // print(entry.key);
+                      setState(() {
+                        selectPurok = entry.key;
+                      });
+                    },
                     child: Icon(
                       Icons.circle,
                       color: Colors.red[400],
@@ -182,38 +251,4 @@ Widget _floatingPanel() {
       ),
     ),
   );
-}
-
-Future<PurokData> fetchPurokData() async {
-  try {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await FirebaseFirestore.instance.collection('reports').get();
-
-    Map<String, LatLng> dataMap = {};
-    Set<String> uniquePuroks = {};
-
-    for (var document in querySnapshot.docs) {
-      final purok = document['purok'];
-      final latitude = document['latitude'];
-      final longitude = document['longitude'];
-      final coordinates = LatLng(latitude, longitude);
-
-      dataMap[purok] = coordinates;
-      uniquePuroks.add(purok);
-    }
-
-    int uniquePurokCount = uniquePuroks.length;
-
-    return PurokData(dataMap, uniquePurokCount);
-  } catch (e) {
-    print('Error fetching data: $e');
-    rethrow; // You might want to handle errors differently based on your use case
-  }
-}
-
-class PurokData {
-  final Map<String, LatLng> data;
-  final int uniquePurokCount;
-
-  PurokData(this.data, this.uniquePurokCount);
 }
