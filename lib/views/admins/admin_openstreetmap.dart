@@ -118,13 +118,13 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Point Details'),
+          title: const Text('Details'),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Coordinate Count: $len',
+                'Case Reported: $len',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
@@ -132,10 +132,10 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
                 'Purok: $purokName ',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10),
-              Text(
-                'Latitude: ${point.latitude}, Longitude: ${point.longitude}',
-              ),
+              // const SizedBox(height: 10),
+              // Text(
+              //   'Latitude: ${point.latitude}, Longitude: ${point.longitude}',
+              // ),
             ],
           ),
           actions: <Widget>[

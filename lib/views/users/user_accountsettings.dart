@@ -179,26 +179,54 @@ class _EditUserInfoScreenState extends State<EditUserInfoScreen> {
       'age': newAge,
       'email': newEmail,
     });
+    // ignore: use_build_context_synchronously
     _showSnackbarSuccess(context, 'User Information updated successfully');
   }
 
   Future<void> _updateUserInfo() async {
     User? user = FirebaseAuth.instance.currentUser;
-    String newName = _newnameController.text;
-    String newAge = _newageController.text;
-    String message = '';
-    String newEmail = _newemailController.text;
-    try {
-      await user!.updateDisplayName(newName);
-      await user.updateEmail(newEmail);
-      await _updateUserInfoinFirestore(user.uid, newName, newAge, newEmail);
-      await user.reload();
 
-      message = 'User Information updated successfully';
-      // ignore: use_build_context_synchronously
-      _showSnackbarSuccess(context, message);
-    } catch (error) {
-      _showSnackbarError(context, error.toString());
-    }
+    bool proceed = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Update'),
+          content: const Text('Do you wish to proceed with the update?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true if user confirms
+              },
+              child: const Text('OK'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false if user cancels
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+    if (proceed = true) {
+      String newName = _newnameController.text;
+      String newAge = _newageController.text;
+      String newEmail = _newemailController.text;
+
+      try {
+        await user!.updateDisplayName(newName);
+        await user.updateEmail(newEmail);
+        await _updateUserInfoinFirestore(user.uid, newName, newAge, newEmail);
+        await user.reload();
+
+        // ignore: use_build_context_synchronously
+        _showSnackbarSuccess(context, "User Information updated successfully");
+      } catch (error) {
+        // ignore: use_build_context_synchronously
+        _showSnackbarError(context, error.toString());
+      }
+    } else {}
   }
 }

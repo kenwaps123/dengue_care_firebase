@@ -1,7 +1,4 @@
-import 'dart:convert';
-
-//import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:denguecare_firebase/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,28 +20,6 @@ class SemaphoreAPI {
     await dotenv.load();
     apikey = dotenv.env['apikey'] ?? '';
   }
-
-  Future<bool> sendSMS(String message, List<String> phoneNumbers) async {
-    final url = Uri.parse(baseUrl);
-    final headers = {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-      'Access-Control-Allow-Methods': 'POST',
-      'Authorization': 'apikey $apikey',
-      'Access-Control-Request-Headers': 'Content-Type, application/json',
-      'Access-Control-Max-Age': '3600',
-    };
-    final data = {
-      'messages': phoneNumbers.map((phoneNumber) {
-        return {'content': message, 'to': phoneNumber};
-      }).toList(),
-    };
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: jsonEncode(data),
-    );
-    return response.statusCode == 200;
-  }
 }
 
 class AdminAnnouncementPage extends StatefulWidget {
@@ -56,10 +31,9 @@ class AdminAnnouncementPage extends StatefulWidget {
 
 class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
   final apikey = dotenv.env['apikey'] ?? '';
-  // final SemaphoreAPI semaphoreAPI = SemaphoreAPI();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController announcementController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  final reference = FirebaseFirestore.instance.collection('users');
 
   @override
   void dispose() {
@@ -102,20 +76,9 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                       const SizedBox(height: 20),
                       const SizedBox(height: 20),
                       TextFormField(
-                        controller: phoneController,
-                        decoration: const InputDecoration(
-                          labelText: 'Phone Number',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.green),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const SizedBox(height: 20),
-                      TextFormField(
                         controller: announcementController,
                         keyboardType: TextInputType.multiline,
-                        maxLines: 4,
+                        maxLines: 6,
                         decoration: const InputDecoration(
                           labelText: 'Announcement',
                           border: OutlineInputBorder(
@@ -136,7 +99,15 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                               ),
                             ),
                             onPressed: () async {
-                              sendSMS();
+                              // Show a confirmation dialog
+                              bool? confirmSend =
+                                  await _showConfirmationDialog(context);
+                              if (confirmSend == true) {
+                                sendBulk();
+                                // ignore: use_build_context_synchronously
+                                Navigator.of(context)
+                                    .popUntil((route) => route.isFirst);
+                              }
                             },
                             child: Text(
                               'Send',
@@ -154,12 +125,67 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
     );
   }
 
-  Future<void> sendSMS() async {
+  Future<void> sendBulk() async {
     final apikey = dotenv.env['apikey'] ?? '';
-    dotenv.load();
-    final number = phoneController.text;
-    final message = announcementController.text;
+    try {
+      List<String> numbers = await getPhoneNumbers();
 
+      List<Future<void>> smsFutures = numbers
+          .map((String number) =>
+              sendSMS(apikey, number, announcementController.text))
+          .toList();
+
+      // Wait for all SMS futures to complete
+      await Future.wait(smsFutures);
+      _formKey.currentState!.reset();
+    } catch (e) {
+      _showSnackbarError('Failed to send SMS');
+    }
+  }
+
+  Future<List<String>> getPhoneNumbers() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+    List<String> numbers = [];
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String numberString = doc['contact_number'];
+      // ignore: avoid_print
+      print('Raw number string: $numberString');
+      numbers.addAll(numberString.split(',').map((e) => e.trim()));
+    }
+    // ignore: avoid_print
+    print('Parsed numbers: $numbers');
+    return numbers;
+  }
+
+  Future<bool?> _showConfirmationDialog(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation'),
+          content: const Text('Are you sure you want to send the SMS?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User clicked "Cancel"
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User clicked "OK"
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> sendSMS(String apikey, String number, String message) async {
     final parameters = {
       'apikey': apikey,
       'number': number,
@@ -174,18 +200,16 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
     );
 
     if (response.statusCode == 200) {
-      print('SMS sent successfully');
-      print(response.body);
+      _showSnackbarSuccess('SMS sent successfully');
     } else {
-      print('Failed to send SMS');
-      print(response.body);
+      _showSnackbarError('Failed to send SMS');
     }
 
-    phoneController.clear();
+    // phoneController.clear();
     announcementController.clear();
   }
 
-  void _showSnackbarSuccess(BuildContext context, String message) {
+  void _showSnackbarSuccess(String message) {
     final snackbar = SnackBar(
       content: Text(message),
       backgroundColor: Colors.green,
@@ -193,7 +217,7 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
-  void _showSnackbarError(BuildContext context, String message) {
+  void _showSnackbarError(String message) {
     final snackbar = SnackBar(
       content: Text(message),
       backgroundColor: Colors.red,

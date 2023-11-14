@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:denguecare_firebase/views/admins/admin_announcements.dart';
 
 import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:denguecare_firebase/views/login_page.dart';
@@ -17,7 +18,7 @@ Future main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // FirebaseFirestore.instance.settings =
   //     const Settings(persistenceEnabled: true);
-//SemaphoreAPI();
+  SemaphoreAPI();
   runApp(const MyApp());
 }
 
