@@ -142,6 +142,31 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+void logAdminAction(String action, String documentId) async {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final user = auth.currentUser;
+
+  CollectionReference adminLogs =
+      FirebaseFirestore.instance.collection('admin_logs');
+
+  // Get the current date and time
+  DateTime currentDateTime = DateTime.now();
+
+  // Format the date and time as a string
+  String formattedDateTime = "${currentDateTime.toLocal()}";
+
+  // Create a log entry
+  Map<String, dynamic> logEntry = {
+    'admin_email': user?.email,
+    'action': action,
+    'document_id': documentId,
+    'timestamp': formattedDateTime,
+  };
+
+  // Add the log entry to the 'admin_logs' collection
+  await adminLogs.add(logEntry);
+}
+
 void route(BuildContext context) {
   User? user = FirebaseAuth.instance.currentUser;
   var kk = FirebaseFirestore.instance
@@ -152,8 +177,10 @@ void route(BuildContext context) {
     if (documentSnapshot.exists) {
       if (documentSnapshot.get('role') == "Admin") {
         Get.offAll(() => const AdminMainPage());
+        logAdminAction('LOG IN', user.uid);
       } else if (documentSnapshot.get('role') == "superadmin") {
         Get.offAll(() => const AdminMainPage());
+        logAdminAction('LOG IN', user.uid);
       } else {
         Get.offAll(() => const UserMainPage());
       }

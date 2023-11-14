@@ -14,10 +14,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../login_page.dart';
 import 'admin_dataviz.dart';
 import 'admin_reportpage.dart';
+import 'package:denguecare_firebase/views/admins/admin_logs.dart';
 
 String? role;
 
 showLogoutConfirmationDialog(BuildContext context) async {
+  User? user = FirebaseAuth.instance.currentUser;
   return showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -35,6 +37,7 @@ showLogoutConfirmationDialog(BuildContext context) async {
             onPressed: () {
               FirebaseAuth.instance.signOut();
               Get.offAll(() => const LoginPage()); // User confirmed logout
+              logAdminAction('LOG OUT', user!.uid);
             },
             child: const Text("Logout"),
           ),
@@ -42,6 +45,31 @@ showLogoutConfirmationDialog(BuildContext context) async {
       );
     },
   );
+}
+
+void logAdminAction(String action, String documentId) async {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final user = auth.currentUser;
+
+  CollectionReference adminLogs =
+      FirebaseFirestore.instance.collection('admin_logs');
+
+  // Get the current date and time
+  DateTime currentDateTime = DateTime.now();
+
+  // Format the date and time as a string
+  String formattedDateTime = "${currentDateTime.toLocal()}";
+
+  // Create a log entry
+  Map<String, dynamic> logEntry = {
+    'admin_email': user?.email,
+    'action': action,
+    'document_id': documentId,
+    'timestamp': formattedDateTime,
+  };
+
+  // Add the log entry to the 'admin_logs' collection
+  await adminLogs.add(logEntry);
 }
 
 class AdminHomePage extends StatefulWidget {
@@ -561,7 +589,9 @@ class _AdminMainPageState extends State<AdminMainPage>
                           Icons.view_list_outlined,
                           color: Colors.black,
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Get.offAll(() => const adminLogs());
+                        },
                       ),
                       ListTile(
                         title: Text(

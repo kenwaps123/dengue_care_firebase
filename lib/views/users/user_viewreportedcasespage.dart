@@ -8,17 +8,16 @@ import '../widgets/input_age_widget.dart';
 import '../widgets/input_contact_number.dart';
 import '../widgets/input_widget.dart';
 
-class AdminViewReportedCasesPage extends StatefulWidget {
+class UserViewReportedCasesPage extends StatefulWidget {
   final Map<String, dynamic> reportedCaseData;
-  const AdminViewReportedCasesPage({super.key, required this.reportedCaseData});
+  const UserViewReportedCasesPage({super.key, required this.reportedCaseData});
 
   @override
-  State<AdminViewReportedCasesPage> createState() =>
-      _AdminViewReportedCasesPageState();
+  State<UserViewReportedCasesPage> createState() =>
+      _UserViewReportedCasesPageState();
 }
 
-class _AdminViewReportedCasesPageState
-    extends State<AdminViewReportedCasesPage> {
+class _UserViewReportedCasesPageState extends State<UserViewReportedCasesPage> {
   bool _isSubmitting = false;
   Widget _buildProgressIndicator() {
     if (_isSubmitting) {
@@ -420,21 +419,14 @@ class _AdminViewReportedCasesPageState
                                 borderRadius: BorderRadius.circular(8.0)),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                items: status.map(buildMenuItemStatus).toList(),
-                                value: valueStatus ??
-                                    widget.reportedCaseData['status'],
-                                hint: Text(widget.reportedCaseData['status'] ??
-                                    valueStatus),
-                                onChanged: (value) {
-                                  setState(() {
-                                    // Update valueAdmitted only if the user selects a new value
-                                    valueStatus = value;
-                                  });
-
-                                  // print it to the console
-                                  print("Selected value: $value");
-                                },
-                              ),
+                                  items:
+                                      status.map(buildMenuItemStatus).toList(),
+                                  value: valueStatus ??
+                                      widget.reportedCaseData['status'],
+                                  hint: Text(
+                                      widget.reportedCaseData['status'] ??
+                                          valueStatus),
+                                  onChanged: null),
                             ),
                           ),
                         ],
@@ -459,33 +451,6 @@ class _AdminViewReportedCasesPageState
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    DateTime? picked = await showDatePicker(
-                                        context: context,
-                                        initialDate: selectedDateofSymptoms,
-                                        firstDate: DateTime(2015, 8),
-                                        lastDate: DateTime(2101));
-                                    if (picked != null &&
-                                        picked != selectedDateofSymptoms) {
-                                      setState(() {
-                                        selectedDateofSymptoms = picked;
-                                        formattedDateOnly =
-                                            "${selectedDateofSymptoms.year}-${selectedDateofSymptoms.month.toString().padLeft(2, '0')}-${selectedDateofSymptoms.day.toString().padLeft(2, '0')}";
-                                        print(formattedDateOnly);
-                                        widget.reportedCaseData[
-                                                'first_symptom_date'] =
-                                            formattedDateOnly;
-                                      });
-                                    }
-                                  },
-                                  child: const Text('Select date'),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                       ),
@@ -511,25 +476,16 @@ class _AdminViewReportedCasesPageState
                                       borderRadius: BorderRadius.circular(8.0)),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
-                                      items: admitted
-                                          .map(buildMenuItemAdmitted)
-                                          .toList(),
-                                      value: valueAdmitted ??
-                                          widget.reportedCaseData[
-                                              'patient_admitted'],
-                                      hint: Text(widget.reportedCaseData[
-                                              'patient_admitted'] ??
-                                          valueAdmitted),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          // Update valueAdmitted only if the user selects a new value
-                                          valueAdmitted = value;
-                                        });
-
-                                        // print it to the console
-                                        print("Selected value: $value");
-                                      },
-                                    ),
+                                        items: admitted
+                                            .map(buildMenuItemAdmitted)
+                                            .toList(),
+                                        value: valueAdmitted ??
+                                            widget.reportedCaseData[
+                                                'patient_admitted'],
+                                        hint: Text(widget.reportedCaseData[
+                                                'patient_admitted'] ??
+                                            valueAdmitted),
+                                        onChanged: null),
                                   ),
                                 ),
                               ],
@@ -545,7 +501,7 @@ class _AdminViewReportedCasesPageState
                                 Expanded(
                                   child: TextFormField(
                                     controller: _hospitalnameController,
-                                    enabled: true,
+                                    enabled: false,
                                     decoration: const InputDecoration(
                                       labelText: 'Hospital name',
                                       prefixIcon:
@@ -581,41 +537,13 @@ class _AdminViewReportedCasesPageState
                                 hint: Text(widget.reportedCaseData[
                                         'patient_recovered'] ??
                                     valueRecovered),
-                                onChanged: (value) {
-                                  setState(() {
-                                    // Update valueAdmitted only if the user selects a new value
-                                    valueRecovered = value;
-                                  });
-
-                                  // print it to the console
-                                  print("Selected value: $value");
-                                },
+                                onChanged: null,
                               ),
                             ),
                           ),
                         ],
                       ),
                       _gap(),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4)),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: Text(
-                              'Submit',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          onPressed: () {
-                            updateDataToFirebase();
-                          },
-                        ),
-                      ),
                     ],
                   ),
                 ),

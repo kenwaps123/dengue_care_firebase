@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:denguecare_firebase/charts/testchart.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 List<List<dynamic>> data = [];
 
@@ -52,7 +54,33 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
     );
   }
 
+  void logAdminAction(String action, String documentId) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+
+    CollectionReference adminLogs =
+        FirebaseFirestore.instance.collection('admin_logs');
+
+    // Get the current date and time
+    DateTime currentDateTime = DateTime.now();
+
+    // Format the date and time as a string
+    String formattedDateTime = "${currentDateTime.toLocal()}";
+
+    // Create a log entry
+    Map<String, dynamic> logEntry = {
+      'admin_email': user?.email,
+      'action': action,
+      'document_id': documentId,
+      'timestamp': formattedDateTime,
+    };
+
+    // Add the log entry to the 'admin_logs' collection
+    await adminLogs.add(logEntry);
+  }
+
   Future<void> _pickAndUploadFile() async {
+    User? user = FirebaseAuth.instance.currentUser;
     setState(() {
       isLoading = true;
       isUploading = true;
@@ -60,12 +88,14 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
 
     try {
       FilePickerResult? pickedfile = await FilePicker.platform.pickFiles(
+        withData: true,
         type: FileType.custom,
         allowedExtensions: ['csv'],
       );
 
       if (pickedfile != null) {
-        Uint8List bytes = pickedfile.files.single.bytes!;
+        Uint8List bytes = pickedfile.files.first.bytes!;
+        print(bytes);
         final csvString = String.fromCharCodes(bytes);
         List<List<dynamic>> csvTable =
             const CsvToListConverter().convert(csvString);
@@ -73,6 +103,7 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
         List<List<dynamic>> data = csvTable;
 
         await process(data);
+        logAdminAction('Import Data', user!.uid);
       }
     } catch (e) {
       print('Error: $e');
@@ -152,18 +183,18 @@ class _AdminDataVizPageState extends State<AdminDataVizPage> {
       }
     }
   }
+
+  /*Future<void> requestStoragePermission() async {
+    PermissionStatus status = await Permission.storage.request();
+
+    if (status.isGranted) {
+      await _pickAndUploadFile();
+      print('Permission Granted');
+      // You can now use the storage
+    } else if (status.isDenied) {
+      print("Permission Denied");
+    } else {
+//    print("Permission Denied");
+    }
+  }*/
 }
-
-// void requestStoragePermission() async {
-//   PermissionStatus status = await Permission.storage.request();
-
-//   if (status.isGranted) {
-//     _pickAndUploadFile();
-//     // You can now use the storage
-//   } else if (status.isPermanentlyDenied) {
-//     // The user chose to never ask again. You can instruct them to manually enable it from the settings.
-//   } else {
-//     // The permission was denied (possibly temporary)
-//   }
-// }
-
