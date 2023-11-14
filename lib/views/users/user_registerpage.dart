@@ -38,8 +38,33 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final String userType = 'User';
   var _verificationId = ''.obs;
-  final int _remainingTime = 60;
+//late int _remainingTime = 60;
+
+  int _counter = 0;
+  late Timer _timer;
+  late StreamController<int> _events;
+
+  @override
+  initState() {
+    super.initState();
+    _events = new StreamController<int>.broadcast();
+    _events.add(60);
+  }
+
+  void _startTimer() {
+    _counter = 60;
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      //setState(() {
+      (_counter > 0) ? _counter-- : _timer.cancel();
+      //});
+      print('This is counter ${_counter}');
+      _events.add(_counter);
+    });
+  }
+
   var _otpCode;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -139,6 +164,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                                 if (_formKey.currentState!.validate()) {
                                   String num =
                                       "+63${_contactNumberController.text}";
+                                  _startTimer();
                                   _showOTPDialog(context);
                                   verifyPhone(num);
                                 }
@@ -173,15 +199,14 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       ),
     );
   }
-//! SHOWDIALOG POP UP
 
   void _showOTPDialog(BuildContext context) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return _cardOTPDialog(context);
-      },
-    );
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return _cardOTPDialog(context);
+        });
   }
 
   Widget _cardOTPDialog(BuildContext context) {
@@ -190,106 +215,114 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
         'Verify your phone number',
         style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
       ),
-      content: Card(
-        child: Container(
-          padding: const EdgeInsets.all(32.0),
-          constraints: const BoxConstraints(maxWidth: 370),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 300),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Verify your phone number',
-                    style: GoogleFonts.poppins(fontSize: 18),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'A 6-digit OTP code is sent to your phone',
-                    style: GoogleFonts.poppins(fontSize: 12),
-                  ),
-                  const SizedBox(height: 20),
-                  OTPTextField(
-                    length: 6,
-                    width: MediaQuery.of(context).size.width,
-                    style: GoogleFonts.poppins(fontSize: 18),
-                    textFieldAlignment: MainAxisAlignment.spaceAround,
-                    fieldStyle: FieldStyle.underline,
-                    inputFormatter: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onCompleted: (pin) {
-                      _otpCode = pin;
-                      //print(_otpCode);
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Time Left: $_remainingTime seconds',
-                    style: GoogleFonts.poppins(fontSize: 12),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 15,
+      content: StreamBuilder<int>(
+        stream: _events.stream,
+        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+          //print('The snapshot data: ${snapshot.data.toString()}');
+          return Card(
+            child: Container(
+              padding: const EdgeInsets.all(32.0),
+              constraints: const BoxConstraints(maxWidth: 370),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
+                      Text(
+                        'Verify your phone number',
+                        style: GoogleFonts.poppins(fontSize: 18),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'A 6-digit OTP code is sent to your phone',
+                        style: GoogleFonts.poppins(fontSize: 12),
+                      ),
+                      const SizedBox(height: 20),
+                      OTPTextField(
+                        length: 6,
+                        width: MediaQuery.of(context).size.width,
+                        style: GoogleFonts.poppins(fontSize: 18),
+                        textFieldAlignment: MainAxisAlignment.spaceAround,
+                        fieldStyle: FieldStyle.underline,
+                        inputFormatter: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        onCompleted: (pin) {
+                          _otpCode = pin;
+                          //print(_otpCode);
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Time Left: ${snapshot.data.toString()}',
+                        //style: GoogleFonts.poppins(fontSize: 12),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 50,
+                              vertical: 15,
+                            ),
+                          ),
+                          onPressed: () async {
+                            // if (_otpCode.isNotEmpty) {
+                            // } else {
+                            //   Utils.showSnackBar("Please enter the OTP code.");
+                            // }
+                            try {
+                              PhoneAuthCredential credential =
+                                  PhoneAuthProvider.credential(
+                                verificationId: _verificationId.value,
+                                smsCode: _otpCode,
+                              );
+
+                              await _auth.signInWithCredential(credential);
+                              signUp(
+                                  _emailController.text.trim(),
+                                  _confirmPasswordController.text.trim(),
+                                  _nameController.text.trim(),
+                                  _ageController.text.trim(),
+                                  _sexController.text.trim(),
+                                  _contactNumberController.text.trim(),
+                                  userType);
+
+                              _showSnackbarSuccess(context, 'Success');
+
+                              // Handle user registration completion
+                            } on FirebaseAuthException catch (e) {
+                              _showSnackbarError(context, e.message.toString());
+                            }
+                          },
+                          child: Text("Confirm",
+                              style: GoogleFonts.poppins(fontSize: 20)),
                         ),
                       ),
-                      onPressed: () async {
-                        // if (_otpCode.isNotEmpty) {
-                        // } else {
-                        //   Utils.showSnackBar("Please enter the OTP code.");
-                        // }
-                        try {
-                          PhoneAuthCredential credential =
-                              PhoneAuthProvider.credential(
-                            verificationId: _verificationId.value,
-                            smsCode: _otpCode,
-                          );
-
-                          await _auth.signInWithCredential(credential);
-                          signUp(
-                              _emailController.text.trim(),
-                              _confirmPasswordController.text.trim(),
-                              _nameController.text.trim(),
-                              _ageController.text.trim(),
-                              _sexController.text.trim(),
-                              _contactNumberController.text.trim(),
-                              userType);
-
-                          _showSnackbarSuccess(context, 'Success');
-
-                          // Handle user registration completion
-                        } on FirebaseAuthException catch (e) {
-                          _showSnackbarError(context, e.message.toString());
-                        }
-                      },
-                      child: Text("Confirm",
-                          style: GoogleFonts.poppins(fontSize: 20)),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
       actions: <Widget>[
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
+            _timer.cancel();
           },
           child: const Text('Close'),
         ),
       ],
     );
   }
+//! SHOWDIALOG POP UP
 
 //! SIGN UP
   void signUp(String email, String password, String name, String age,
