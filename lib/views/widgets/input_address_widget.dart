@@ -35,7 +35,7 @@ class InputAddressWidget extends StatelessWidget {
           return null;
         },
         keyboardType: TextInputType.multiline,
-        maxLines: 4,
+        maxLines: 3,
         obscureText: obscureText,
         initialValue: initialVal,
         controller: controller,

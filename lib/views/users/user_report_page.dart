@@ -18,6 +18,7 @@ class UserReportPage extends StatefulWidget {
 
 class _UserReportPageState extends State<UserReportPage> {
   bool _isSubmitting = false;
+  final _formKey = GlobalKey<FormState>();
   Widget _buildProgressIndicator() {
     if (_isSubmitting) {
       return const Center(
@@ -40,8 +41,6 @@ class _UserReportPageState extends State<UserReportPage> {
   final TextEditingController _contactnumberController =
       TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _addressLine1Controller = TextEditingController();
-  final TextEditingController _addressLine2Controller = TextEditingController();
 
   bool _headache = false;
   bool _bodymalaise = false;
@@ -139,6 +138,7 @@ class _UserReportPageState extends State<UserReportPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Form(
+            key: _formKey,
             child: Center(
               child: Card(
                 elevation: 8,
@@ -202,7 +202,6 @@ class _UserReportPageState extends State<UserReportPage> {
                           ),
                         ],
                       ),
-
                       _gap(),
                       //! CONTACT NUMBER
                       InputContactNumber(
@@ -210,47 +209,32 @@ class _UserReportPageState extends State<UserReportPage> {
                         controller: _contactnumberController,
                         obscureText: false,
                       ),
-                      InputWidget(
-                        hintText: "Address Line 1",
-                        controller: _addressLine1Controller,
+                      _gap(),
+                      InputAddressWidget(
+                        labelText: 'Address',
+                        controller: _addressController,
                         obscureText: false,
                       ),
                       _gap(),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InputWidget(
-                              hintText: "Address Line 2",
-                              controller: _addressLine2Controller,
-                              obscureText: false,
-                            ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            items: puroklist.keys.map((String purok) {
+                              return DropdownMenuItem<String>(
+                                value: purok,
+                                child: Text(purok),
+                              );
+                            }).toList(),
+                            value: purokvalue,
+                            onChanged: (val) =>
+                                setState(() => purokvalue = val),
                           ),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 4, vertical: 4),
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    items: puroklist.keys.map((String purok) {
-                                      return DropdownMenuItem<String>(
-                                        value: purok,
-                                        child: Text(purok),
-                                      );
-                                    }).toList(),
-                                    value: purokvalue,
-                                    onChanged: (val) =>
-                                        setState(() => purokvalue = val),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                       _gap(),
                       Padding(
@@ -486,7 +470,9 @@ class _UserReportPageState extends State<UserReportPage> {
                             ),
                           ),
                           onPressed: () {
-                            uploadDataToFirebase();
+                            if (_formKey.currentState!.validate()) {
+                              uploadDataToFirebase();
+                            }
                           },
                         ),
                       ),
@@ -520,8 +506,7 @@ class _UserReportPageState extends State<UserReportPage> {
         'age': _ageController.text,
         'sex': value,
         'contact_number': _contactnumberController.text,
-        'address_line1': _addressLine1Controller.text,
-        'address_line2': _addressLine2Controller.text,
+        'address': _addressController.text,
         'purok': purokvalue,
         'headache': _headache,
         'body_malaise': _bodymalaise,
@@ -577,8 +562,6 @@ class _UserReportPageState extends State<UserReportPage> {
       _nameController.clear();
       _ageController.clear();
       _addressController.clear();
-      _addressLine1Controller.clear();
-      _addressLine2Controller.clear();
       _contactnumberController.clear();
       purokvalue = 'Select Purok';
       value = 'Male';

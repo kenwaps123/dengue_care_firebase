@@ -66,7 +66,7 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('images/logo-no-background.png'),
+                      Image.asset('assets/images/logo-no-background.png'),
                       const SizedBox(height: 20),
                       Text(
                         'SEND ANNOUNCEMENTS',

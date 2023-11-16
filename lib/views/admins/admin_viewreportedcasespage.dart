@@ -149,6 +149,7 @@ class _AdminViewReportedCasesPageState
                       _gap(),
 
                       InputWidget(
+                        labelText: 'Name',
                         hintText: "Name",
                         obscureText: false,
                         initialVal: widget.reportedCaseData['name'],
@@ -159,6 +160,7 @@ class _AdminViewReportedCasesPageState
                         children: [
                           Expanded(
                             child: InputAgeWidget(
+                              labelText: "Age",
                               hintText: "Age",
                               obscureText: false,
                               enableTextInput: false,
@@ -188,22 +190,16 @@ class _AdminViewReportedCasesPageState
                       _gap(),
                       //! CONTACT NUMBER
                       InputContactNumber(
+                        labelText: 'Contact Number',
                         hintText: "Contact Number (10-digit)",
                         initialVal: widget.reportedCaseData['contact_number'],
                         enableTextInput: false,
                         obscureText: false,
                       ),
                       _gap(),
-                      InputWidget(
-                        hintText: "Address Line 1",
-                        initialVal: widget.reportedCaseData['address_line1'],
-                        obscureText: false,
-                        enableTextInput: false,
-                      ),
-                      _gap(),
-                      InputWidget(
-                        hintText: "Address Line 2",
-                        initialVal: widget.reportedCaseData['address_line2'],
+                      InputAddressWidget(
+                        labelText: 'Address',
+                        initialVal: widget.reportedCaseData['address'],
                         obscureText: false,
                         enableTextInput: false,
                       ),
