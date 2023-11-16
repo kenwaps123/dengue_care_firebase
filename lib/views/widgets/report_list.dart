@@ -16,10 +16,7 @@ class _ReportListWidgetState extends State<ReportListWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('reports')
-          .orderBy('checked')
-          .snapshots(),
+      stream: FirebaseFirestore.instance.collection('reports').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -44,7 +41,15 @@ class _ReportListWidgetState extends State<ReportListWidget> {
               width: 50,
               padding: const EdgeInsets.all(8.0),
               child: Card(
-                color: data['checked'] == 'Yes' ? Colors.grey : Colors.white,
+                color: data['checked'] == 'Yes'
+                    ? Colors.grey
+                    : (data['status'] == 'Suspected'
+                        ? Colors.blue
+                        : (data['status'] == 'Probable'
+                            ? Colors.orange
+                            : (data['status'] == 'Confirmed'
+                                ? Colors.red
+                                : Colors.white))),
                 elevation: 3.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
