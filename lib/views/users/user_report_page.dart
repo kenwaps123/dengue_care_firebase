@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:uuid/uuid.dart';
 import '../widgets/input_address_widget.dart';
 import '../widgets/input_age_widget.dart';
 import '../widgets/input_widget.dart';
@@ -29,11 +30,14 @@ class _UserReportPageState extends State<UserReportPage> {
     }
   }
 
+  final uuid = const Uuid();
+  String uniqueDocId = '';
   @override
   void initState() {
     super.initState();
     // Set the default value for the text controller
     purokvalue = 'Select Purok';
+    generateUniqueId();
   }
 
   final TextEditingController _nameController = TextEditingController();
@@ -487,6 +491,12 @@ class _UserReportPageState extends State<UserReportPage> {
     );
   }
 
+  void generateUniqueId() {
+    setState(() {
+      uniqueDocId = uuid.v4(); // Generates a new unique ID
+    });
+  }
+
   void uploadDataToFirebase() async {
     setState(() {
       _isSubmitting = true; // Begin submission
@@ -506,6 +516,7 @@ class _UserReportPageState extends State<UserReportPage> {
         'age': _ageController.text,
         'sex': value,
         'contact_number': _contactnumberController.text,
+        'document_id': uniqueDocId,
         'address': _addressController.text,
         'purok': purokvalue,
         'headache': _headache,

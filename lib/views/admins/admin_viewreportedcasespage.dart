@@ -421,14 +421,14 @@ class _AdminViewReportedCasesPageState
                                     widget.reportedCaseData['status'],
                                 hint: Text(widget.reportedCaseData['status'] ??
                                     valueStatus),
-                                onChanged: (value) {
+                                onChanged: (newvalue) {
+                                  updateStatusData(newvalue!);
                                   setState(() {
-                                    // Update valueAdmitted only if the user selects a new value
-                                    valueStatus = value;
+                                    valueStatus = newvalue;
                                   });
 
                                   // print it to the console
-                                  print("Selected value: $value");
+                                  print("Selected value: $newvalue");
                                 },
                               ),
                             ),
@@ -623,6 +623,17 @@ class _AdminViewReportedCasesPageState
     );
   }
 
+  void updateStatusData(String selectedValue) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    String docID = await fetchDocumentID();
+    // Assuming you have a 'your_collection' collection and a document with 'your_document_id'
+    DocumentReference documentReference =
+        firestore.collection('reports').doc(docID);
+
+    // Update the specific field with the selected value
+    await documentReference.update({'status': selectedValue});
+  }
+
   Future<String> getDocumentID() async {
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('reports');
@@ -664,11 +675,11 @@ class _AdminViewReportedCasesPageState
     // // Get the current date
 
     Map<String, dynamic> updateData = {
-      'status': valueStatus,
       'first_symptom_date': formattedDateOnly,
       'patient_admitted': valueAdmitted,
       'hospital_name': _hospitalnameController.text,
       'patient_recovered': valueRecovered,
+      'checked': 'Yes'
     };
 
     userDocRef.update(updateData).then((value) {

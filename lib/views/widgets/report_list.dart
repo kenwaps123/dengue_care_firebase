@@ -16,7 +16,10 @@ class _ReportListWidgetState extends State<ReportListWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('reports').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('reports')
+          .orderBy('date', descending: true)
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -41,41 +44,61 @@ class _ReportListWidgetState extends State<ReportListWidget> {
               width: 50,
               padding: const EdgeInsets.all(8.0),
               child: Card(
-                color: data['checked'] == 'Yes'
-                    ? Colors.grey
-                    : (data['status'] == 'Suspected'
-                        ? Colors.blue
-                        : (data['status'] == 'Probable'
-                            ? Colors.orange
-                            : (data['status'] == 'Confirmed'
-                                ? Colors.red
-                                : Colors.white))),
+                color: _getColorForStatus(data['status']),
                 elevation: 3.0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0)),
                 child: ListTile(
+                  textColor: Colors.white,
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Name: ' + data['name'],
-                        style: GoogleFonts.poppins(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                      RichText(
+                        text: TextSpan(children: [
+                          const WidgetSpan(
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const TextSpan(text: ' '),
+                          TextSpan(
+                              text: data['name'],
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14, color: Colors.white)),
+                        ]),
                       ),
-                      Text(
-                        'Age: ' + data['age'],
-                        style: GoogleFonts.poppins(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                      RichText(
+                        text: TextSpan(children: [
+                          const WidgetSpan(
+                            child: Icon(
+                              Icons.calendar_today_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const TextSpan(text: ' '),
+                          TextSpan(
+                              text: data['age'],
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14, color: Colors.white)),
+                        ]),
                       ),
                     ],
                   ),
-                  subtitle: Text(
-                    'Contact number: ' + data['contact_number'],
-                    style: GoogleFonts.poppins(fontSize: 11),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  subtitle: RichText(
+                    text: TextSpan(children: [
+                      const WidgetSpan(
+                        child: Icon(
+                          Icons.contact_phone,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const TextSpan(text: ' '),
+                      TextSpan(
+                          text: data['contact_number'],
+                          style: GoogleFonts.poppins(
+                              fontSize: 14, color: Colors.white)),
+                    ]),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -89,11 +112,20 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                       const SizedBox(
                         width: 8,
                       ),
-                      Text(
-                        'Date: $formattedDate',
-                        style: GoogleFonts.poppins(fontSize: 12),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                      RichText(
+                        text: TextSpan(children: [
+                          const WidgetSpan(
+                            child: Icon(
+                              Icons.calendar_month_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const TextSpan(text: ' '),
+                          TextSpan(
+                              text: formattedDate,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14, color: Colors.white)),
+                        ]),
                       ),
                       const SizedBox(
                         width: 24,
@@ -105,7 +137,10 @@ class _ReportListWidgetState extends State<ReportListWidget> {
                           Get.to(() => AdminViewReportedCasesPage(
                               reportedCaseData: data));
                         },
-                        icon: const Icon(Icons.edit_note_rounded),
+                        icon: const Icon(
+                          Icons.edit_note_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -119,5 +154,18 @@ class _ReportListWidgetState extends State<ReportListWidget> {
         );
       },
     );
+  }
+}
+
+Color _getColorForStatus(String status) {
+  switch (status) {
+    case 'Suspected':
+      return Colors.blue;
+    case 'Probable':
+      return Colors.orange;
+    case 'Confirmed':
+      return Colors.red;
+    default:
+      return Colors.white;
   }
 }

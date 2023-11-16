@@ -80,7 +80,6 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
               .collection('reports')
               .where('purok', isEqualTo: selectedPurok)
               .get();
-
       int size = querySnapshot.size;
       setState(() {
         size = querySnapshot.size;
@@ -132,6 +131,7 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
                 'Purok: $purokName ',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+
               // const SizedBox(height: 10),
               // Text(
               //   'Latitude: ${point.latitude}, Longitude: ${point.longitude}',
