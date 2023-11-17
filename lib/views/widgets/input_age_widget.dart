@@ -5,14 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 class InputAgeWidget extends StatelessWidget {
   const InputAgeWidget(
       {super.key,
-      required this.hintText,
+      this.hintText,
       this.labelText,
       this.controller,
       required this.obscureText,
       this.initialVal,
       this.enableTextInput});
 
-  final String hintText;
+  final String? hintText;
   final TextEditingController? controller;
   final bool obscureText;
   final String? initialVal;

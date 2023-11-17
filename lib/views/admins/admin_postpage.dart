@@ -19,6 +19,8 @@ final TextEditingController _contentController = TextEditingController();
 File? _selectedImage;
 File? image;
 List<Uint8List> pickedImagesInBytes = [];
+XFile? imagefromWeb;
+late Uint8List? bytes;
 
 Uint8List convertListToUint8List(List<int> list) {
   return Uint8List.fromList(list);
@@ -32,6 +34,40 @@ class AdminPostPage extends StatefulWidget {
 }
 
 class _AdminPostPageState extends State<AdminPostPage> {
+  String downloadURL = '';
+
+  Future<void> _pickImageWeb() async {
+    try {
+      ImagePicker picker = ImagePicker();
+      imagefromWeb = await picker.pickImage(source: ImageSource.gallery);
+      if (imagefromWeb != null) {
+        bytes = await imagefromWeb!.readAsBytes();
+      }
+    } catch (e) {
+      _showSnackbarError(context, e.toString());
+    }
+  }
+
+  void uploadimgWeb() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final imageRef = storageRef.child('images/${imagefromWeb!.name}');
+
+      await imageRef.putData(
+          bytes!, SettableMetadata(contentType: 'image/jpeg'));
+
+      final String downloadURL = await imageRef.getDownloadURL();
+
+      setState(() {
+        this.downloadURL = downloadURL;
+      });
+    } catch (e) {
+      _showSnackbarError(context, e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,42 +171,6 @@ class _AdminPostPageState extends State<AdminPostPage> {
       _selectedImage = null;
       imageUrl = '';
     });
-  }
-
-  Future<File> _convertBytesToFile(Uint8List bytes, String fileName) async {
-    String tempDir = (await getTemporaryDirectory()).path;
-    File file = File('$tempDir/$fileName');
-    await file.writeAsBytes(bytes);
-    return file;
-  }
-
-  Future<void> _pickImageWeb() async {
-    FilePickerResult? filePickerResult = await FilePicker.platform
-        .pickFiles(type: FileType.image, allowMultiple: false);
-
-    try {
-      if (filePickerResult != null && filePickerResult.files.isNotEmpty) {
-        Uint8List? imageBytes = filePickerResult.files.first.bytes;
-        if (imageBytes != null) {
-          // Convert Uint8List to File
-          File imageFile = await _convertBytesToFile(imageBytes, 'image.jpg');
-
-          // Use the imageFile as needed
-          setState(() {
-            _selectedImage = imageFile;
-          });
-        }
-
-        for (var element in filePickerResult.files) {
-          setState(() {
-            pickedImagesInBytes.add(element.bytes!);
-          });
-        }
-      }
-    } catch (e) {
-      _showSnackbarError(context, e.toString());
-      print(e.toString());
-    }
   }
 
   void imgPickUpload() async {

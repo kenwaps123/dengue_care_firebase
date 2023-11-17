@@ -40,7 +40,8 @@ class _UserReportPageState extends State<UserReportPage> {
     generateUniqueId();
   }
 
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _firstnameController = TextEditingController();
+  final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _contactnumberController =
       TextEditingController();
@@ -170,17 +171,31 @@ class _UserReportPageState extends State<UserReportPage> {
                             textAlign: TextAlign.center),
                       ),
                       _gap(),
-                      InputWidget(
-                        hintText: "Name",
-                        controller: _nameController,
-                        obscureText: false,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InputWidget(
+                              labelText: "First Name",
+                              controller: _firstnameController,
+                              obscureText: false,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: InputWidget(
+                              labelText: "Last Name",
+                              controller: _lastnameController,
+                              obscureText: false,
+                            ),
+                          )
+                        ],
                       ),
                       _gap(),
                       Row(
                         children: [
                           Expanded(
                             child: InputAgeWidget(
-                              hintText: "Age",
+                              labelText: 'Age',
                               controller: _ageController,
                               obscureText: false,
                             ),
@@ -209,8 +224,8 @@ class _UserReportPageState extends State<UserReportPage> {
                       _gap(),
                       //! CONTACT NUMBER
                       InputContactNumber(
-                        hintText: "Contact Number (10-digit)",
                         controller: _contactnumberController,
+                        labelText: 'Contact Number (10-digit)',
                         obscureText: false,
                       ),
                       _gap(),
@@ -512,7 +527,8 @@ class _UserReportPageState extends State<UserReportPage> {
       LatLng selectedLatLng =
           puroklist[selectedPurok] ?? const LatLng(0.0, 0.0);
       await reports.add({
-        'name': _nameController.text,
+        'firstname': _firstnameController.text,
+        'lastname': _lastnameController.text,
         'age': _ageController.text,
         'sex': value,
         'contact_number': _contactnumberController.text,
@@ -570,7 +586,8 @@ class _UserReportPageState extends State<UserReportPage> {
 
   void resetForm() {
     setState(() {
-      _nameController.clear();
+      _firstnameController.clear();
+      _lastnameController.clear();
       _ageController.clear();
       _addressController.clear();
       _contactnumberController.clear();

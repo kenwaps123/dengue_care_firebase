@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:denguecare_firebase/views/admins/admin_viewreportedcasespage.dart';
-import 'package:denguecare_firebase/views/users/user_viewreportedcasespage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -63,35 +61,61 @@ class _ReportsHistoryState extends State<ReportsHistory> {
                         width: 50,
                         padding: const EdgeInsets.all(8.0),
                         child: Card(
-                          color: data['checked'] == 'Yes'
-                              ? Colors.grey
-                              : Colors.white,
+                          color: _getColorForStatus(data['status']),
                           elevation: 3.0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.0)),
                           child: ListTile(
+                            textColor: Colors.white,
                             title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Name: ' + data['name'],
-                                  style: GoogleFonts.poppins(fontSize: 14),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                                RichText(
+                                  text: TextSpan(children: [
+                                    const WidgetSpan(
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const TextSpan(text: ' '),
+                                    TextSpan(
+                                        text: data['name'],
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 14, color: Colors.white)),
+                                  ]),
                                 ),
-                                Text(
-                                  'Age: ' + data['age'],
-                                  style: GoogleFonts.poppins(fontSize: 14),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                                RichText(
+                                  text: TextSpan(children: [
+                                    const WidgetSpan(
+                                      child: Icon(
+                                        Icons.calendar_today_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const TextSpan(text: ' '),
+                                    TextSpan(
+                                        text: data['age'],
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 14, color: Colors.white)),
+                                  ]),
                                 ),
                               ],
                             ),
-                            subtitle: Text(
-                              'Contact number: ' + data['contact_number'],
-                              style: GoogleFonts.poppins(fontSize: 11),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                            subtitle: RichText(
+                              text: TextSpan(children: [
+                                const WidgetSpan(
+                                  child: Icon(
+                                    Icons.contact_phone,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const TextSpan(text: ' '),
+                                TextSpan(
+                                    text: data['contact_number'],
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 14, color: Colors.white)),
+                              ]),
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -105,11 +129,20 @@ class _ReportsHistoryState extends State<ReportsHistory> {
                                 const SizedBox(
                                   width: 8,
                                 ),
-                                Text(
-                                  'Date: $formattedDate',
-                                  style: GoogleFonts.poppins(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                                RichText(
+                                  text: TextSpan(children: [
+                                    const WidgetSpan(
+                                      child: Icon(
+                                        Icons.calendar_month_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const TextSpan(text: ' '),
+                                    TextSpan(
+                                        text: formattedDate,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 14, color: Colors.white)),
+                                  ]),
                                 ),
                                 const SizedBox(
                                   width: 24,
@@ -118,20 +151,14 @@ class _ReportsHistoryState extends State<ReportsHistory> {
                                   onPressed: () {
                                     // Get.offAll(() => AdminViewReportedCasesPage(
                                     //     reportedCaseData: data));
-                                    Get.to(() => UserViewReportedCasesPage(
+                                    Get.to(() => AdminViewReportedCasesPage(
                                         reportedCaseData: data));
                                   },
-                                  icon: const Icon(Icons.edit_note_rounded),
+                                  icon: const Icon(
+                                    Icons.edit_note_rounded,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                /*const SizedBox(
-                              width: 24,
-                            ),
-                            Text(
-                              'Checked: ' + data['checked'],
-                              style: GoogleFonts.poppins(fontSize: 14),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            )*/
                               ],
                             ),
                           ),
@@ -147,5 +174,18 @@ class _ReportsHistoryState extends State<ReportsHistory> {
             ),
           )),
     );
+  }
+}
+
+Color _getColorForStatus(String status) {
+  switch (status) {
+    case 'Suspected':
+      return Colors.blue;
+    case 'Probable':
+      return Colors.orange;
+    case 'Confirmed':
+      return Colors.red;
+    default:
+      return Colors.white;
   }
 }

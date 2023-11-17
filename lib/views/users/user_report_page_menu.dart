@@ -27,11 +27,12 @@ class _UserReportPageMenuState extends State<UserReportPageMenu> {
               onPressed: () {
                 Get.to(() => const UserReportPage());
               },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
                 child: Text(
                   'Submit a New Case',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.poppins(
+                      fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -44,11 +45,12 @@ class _UserReportPageMenuState extends State<UserReportPageMenu> {
               onPressed: () {
                 Get.to(() => const ReportsHistory());
               },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
                 child: Text(
                   '      View History      ',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.poppins(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

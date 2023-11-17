@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../widgets/input_address_widget.dart';
@@ -31,6 +32,8 @@ class _AdminViewReportedCasesPageState
   }
 
   final TextEditingController _hospitalnameController = TextEditingController();
+  final TextEditingController _contactNumberController =
+      TextEditingController();
 
   String? value;
   final sex = ['Male', 'Female'];
@@ -111,6 +114,17 @@ class _AdminViewReportedCasesPageState
     valueRecovered = widget.reportedCaseData['patient_recovered'];
     valueAdmitted = widget.reportedCaseData['patient_admitted'];
     valueStatus = widget.reportedCaseData['status'];
+    _contactNumberController.text =
+        '0${widget.reportedCaseData['contact_number']}';
+  }
+
+  void _copyToClipboard() {
+    Clipboard.setData(ClipboardData(text: _contactNumberController.text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Text copied to clipboard'),
+      ),
+    );
   }
 
   @override
@@ -147,13 +161,26 @@ class _AdminViewReportedCasesPageState
                             style: Theme.of(context).textTheme.headlineSmall),
                       ),
                       _gap(),
-
-                      InputWidget(
-                        labelText: 'Name',
-                        hintText: "Name",
-                        obscureText: false,
-                        initialVal: widget.reportedCaseData['name'],
-                        enableTextInput: false,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InputWidget(
+                              labelText: "First Name",
+                              initialVal: widget.reportedCaseData['firstName'],
+                              obscureText: false,
+                              enableTextInput: false,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: InputWidget(
+                              labelText: "Last Name",
+                              initialVal: widget.reportedCaseData['lastName'],
+                              obscureText: false,
+                              enableTextInput: false,
+                            ),
+                          ),
+                        ],
                       ),
                       _gap(),
                       Row(
@@ -189,12 +216,24 @@ class _AdminViewReportedCasesPageState
                       ),
                       _gap(),
                       //! CONTACT NUMBER
-                      InputContactNumber(
-                        labelText: 'Contact Number',
-                        hintText: "Contact Number (10-digit)",
-                        initialVal: widget.reportedCaseData['contact_number'],
-                        enableTextInput: false,
-                        obscureText: false,
+                      Stack(
+                        alignment: Alignment.centerRight,
+                        children: [
+                          InputContactNumber(
+                            labelText: 'Contact Number',
+                            hintText: "Contact Number (10-digit)",
+                            initialVal:
+                                widget.reportedCaseData['contact_number'],
+                            enableTextInput: false,
+                            obscureText: false,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.content_copy),
+                            onPressed: () {
+                              _copyToClipboard();
+                            },
+                          ),
+                        ],
                       ),
                       _gap(),
                       InputAddressWidget(

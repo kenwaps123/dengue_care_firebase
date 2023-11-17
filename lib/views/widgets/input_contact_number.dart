@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 class InputContactNumber extends StatelessWidget {
   const InputContactNumber({
     super.key,
-    required this.hintText,
+    this.hintText,
     this.controller,
     required this.obscureText,
     this.initialVal,
@@ -13,7 +13,7 @@ class InputContactNumber extends StatelessWidget {
     this.labelText,
   });
 
-  final String hintText;
+  final String? hintText;
   final TextEditingController? controller;
   final bool obscureText;
   final String? initialVal;

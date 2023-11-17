@@ -21,20 +21,22 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
   int purokCounter = 0;
   String selectPurok = '';
   int? len;
+  int? suspectedCount;
+  int? probableCount;
+  int? confirmedCount;
+  int? suslen;
+  int? problen;
+  int? conflen;
+
   final FirebaseFirestore db = FirebaseFirestore.instance;
   @override
   void initState() {
     super.initState();
     fetchPurokData();
     fetchData();
-    //getPurokCount();
   }
 
-  // final List<LatLng> points = [
-  //   const LatLng(7.113932, 125.624737),
-  //   const LatLng(7.11310, 125.624430),
-  //   const LatLng(7.1200, 125.624737),
-  // ];
+  //! For Map Purok Data
   Future<Map<String, LatLng>> fetchPurokData() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -73,6 +75,7 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
     }
   }
 
+  //!Individual Purok Data
   Future<int> getCountForPurok(String selectedPurok) async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -81,9 +84,46 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
               .where('purok', isEqualTo: selectedPurok)
               .get();
       int size = querySnapshot.size;
+
+      QuerySnapshot<Map<String, dynamic>> querySus = await FirebaseFirestore
+          .instance
+          .collection('reports')
+          .where('purok', isEqualTo: selectedPurok)
+          .where('status', isEqualTo: 'Suspected')
+          .get();
+
+      int susSize = querySus.size;
+
+      QuerySnapshot<Map<String, dynamic>> queryProb = await FirebaseFirestore
+          .instance
+          .collection('reports')
+          .where('purok', isEqualTo: selectedPurok)
+          .where('status', isEqualTo: 'Probable')
+          .get();
+
+      int probSize = queryProb.size;
+
+      QuerySnapshot<Map<String, dynamic>> queryConf = await FirebaseFirestore
+          .instance
+          .collection('reports')
+          .where('purok', isEqualTo: selectedPurok)
+          .where('status', isEqualTo: 'Confirmed')
+          .get();
+
+      int confSize = queryConf.size;
+
       setState(() {
         size = querySnapshot.size;
         len = size;
+
+        susSize = querySus.size;
+        suslen = susSize;
+
+        probSize = queryProb.size;
+        problen = probSize;
+
+        confSize = queryConf.size;
+        conflen = confSize;
       });
       return size;
     } catch (e) {
@@ -117,21 +157,37 @@ class _AdminOpenStreetMapState extends State<AdminOpenStreetMap> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Details'),
+          title: Text(
+            'Details',
+            style: GoogleFonts.poppins(fontSize: 24),
+          ),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Case Reported: $len',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Purok: $purokName ',
+                style: GoogleFonts.poppins(
+                    fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
-                'Purok: $purokName ',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                'Suspected Cases: $suslen',
+                style: GoogleFonts.poppins(fontSize: 16),
               ),
-
+              Text(
+                'Probable Cases: $problen',
+                style: GoogleFonts.poppins(fontSize: 16),
+              ),
+              Text(
+                'Confirmed Cases: $conflen',
+                style: GoogleFonts.poppins(fontSize: 16),
+              ),
               // const SizedBox(height: 10),
               // Text(
               //   'Latitude: ${point.latitude}, Longitude: ${point.longitude}',
