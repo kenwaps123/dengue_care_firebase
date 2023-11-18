@@ -40,7 +40,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final String userType = 'User';
   var _verificationId = ''.obs;
-  final int _remainingTime = 60;
+  int _remainingTime = 60;
+  late Timer _timer;
   var _otpCode;
   @override
   void dispose() {
@@ -177,6 +178,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 //! SHOWDIALOG POP UP
 
   void _showOTPDialog(BuildContext context) {
+    _startTimer();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -277,6 +280,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                               action: SnackBarAction(
                                   label: 'Text', onPressed: () {}));
 
+                          _updateTimer();
                           // Handle user registration completion
                         } on FirebaseAuthException catch (e) {
                           Utils.showSnackBar(e.message);
@@ -372,5 +376,22 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       codeSent: codeSent,
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
     );
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingTime > 0) {
+        _remainingTime--;
+        setState(() {});
+      } else {
+        _timer.cancel();
+      }
+    });
+  }
+
+  void _updateTimer() {
+    setState(() {
+      _remainingTime = 60; // Reset the timer
+    });
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:denguecare_firebase/main.dart';
 import 'package:denguecare_firebase/views/admins/admin_homepage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -183,7 +182,73 @@ class _AdminAnnouncementPageState extends State<AdminAnnouncementPage> {
     }
   }
 
-  void _showSnackbarSuccess(BuildContext context, String message) {
+  Future<List<String>> getPhoneNumbers() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+    List<String> numbers = [];
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      String numberString = doc['contact_number'];
+      // ignore: avoid_print
+      print('Raw number string: $numberString');
+      numbers.addAll(numberString.split(',').map((e) => e.trim()));
+    }
+    // ignore: avoid_print
+    print('Parsed numbers: $numbers');
+    return numbers;
+  }
+
+  Future<bool?> _showConfirmationDialog(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation'),
+          content: const Text('Are you sure you want to send the SMS?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User clicked "Cancel"
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User clicked "OK"
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> sendSMS(String apikey, String number, String message) async {
+    final parameters = {
+      'apikey': apikey,
+      'number': number,
+      'message': message,
+    };
+    final response = await http.post(
+      Uri.parse('https://api.semaphore.co/api/v4/messages'),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: parameters,
+    );
+
+    if (response.statusCode == 200) {
+      _showSnackbarSuccess('SMS sent successfully');
+    } else {
+      _showSnackbarError('Failed to send SMS');
+    }
+
+    // phoneController.clear();
+    announcementController.clear();
+  }
+
+  void _showSnackbarSuccess(String message) {
     final snackbar = SnackBar(
       content: Text(message),
       backgroundColor: Colors.green,
